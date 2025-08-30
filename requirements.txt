@@ -25,7 +25,7 @@ filelock==3.19.1
 fonttools==4.59.1
 frozenlist==1.7.0
 fsspec==2025.7.0
-genai==2.1.0
+genai==2.0.0
 gitdb==4.0.12
 GitPython==3.1.45
 google-auth==2.40.3
