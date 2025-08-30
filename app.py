@@ -428,9 +428,34 @@ def secondary_page():
                             st.success("✅ Prediction Successful!")
                             st.markdown(
                                 f"""
-                                <div style="background-color:#f9f9f9;padding:20px;border-radius:12px;
-                                            box-shadow:0 4px 8px rgba(0,0,0,0.1);margin-top:15px;">
-                                    <h3 style="color:#333;">🎬 {results['title']}</h3>
+                                <style>
+                                .movie-card {{
+                                    padding: 20px;
+                                    border-radius: 12px;
+                                    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+                                    margin-top: 15px;
+                                    transition: background-color 0.3s, color 0.3s;
+                                }}
+
+                                /* Light mode */
+                                @media (prefers-color-scheme: light) {{
+                                    .movie-card {{
+                                        background-color: #f9f9f9;
+                                        color: #333;
+                                    }}
+                                }}
+
+                                /* Dark mode */
+                                @media (prefers-color-scheme: dark) {{
+                                    .movie-card {{
+                                        background-color: #1e1e1e;
+                                        color: #f5f5f5;
+                                    }}
+                                }}
+                                </style>
+
+                                <div class="movie-card">
+                                    <h3>🎬 {results['title']}</h3>
                                     <p><b>📅 Release Date:</b> {results['release date']}</p>
                                     <p><b>💥 Hype Score:</b> {results['hype score']}</p>
                                 </div>
@@ -481,8 +506,44 @@ def entry_page():
 # -----------------------------
 def main():
     st.set_page_config(layout="wide")
-    st.markdown("<h1 style='text-align: center; color: black;'>Smart Recommendation Interface (SRI)</h1>", unsafe_allow_html=True)
-    st.markdown('<br>',unsafe_allow_html=True)
+    st.markdown(
+        """
+        <style>
+        .sri-title {
+            text-align: center;
+            font-size: 2.5em;
+            font-weight: bold;
+            transition: color 0.3s;
+        }
+
+        /* Light mode */
+        @media (prefers-color-scheme: light) {
+            .sri-title {
+                color: black;
+            }
+            .sri-divider {
+                border-color: #ccc;
+            }
+        }
+
+        /* Dark mode */
+        @media (prefers-color-scheme: dark) {
+            .sri-title {
+                color: #f5f5f5;
+            }
+            .sri-divider {
+                border-color: #666;
+            }
+        }
+        </style>
+
+        <h1 class="sri-title">Smart Recommendation Interface (SRI)</h1>
+        <br>
+        <hr class="sri-divider">
+        """,
+        unsafe_allow_html=True
+    )
+
 
     if 'logged_in' not in st.session_state:
         st.session_state.logged_in = False
