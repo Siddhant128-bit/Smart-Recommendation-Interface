@@ -48,8 +48,8 @@ def get_google_trend(title, date_str, max_retries=5, initial_delay=10,window=10)
             if target_date <= data_monthly['ds'].max():
                 # Historical value
                 # closest = data_monthly.iloc[(data_monthly['ds'] - target_date).abs().argsort()[:1]]
-                # return float(data[title].mean())
-                return float(data[title].iloc[0])
+                return float(data[title].mean())
+                # return float(data[title].iloc[0])
             else:
                 # Forecast
                 m = Prophet(yearly_seasonality=True, daily_seasonality=False, weekly_seasonality=False)
