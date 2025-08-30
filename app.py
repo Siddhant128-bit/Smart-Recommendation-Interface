@@ -468,12 +468,12 @@ def entry_page():
     # Layout preserved exactly as you requested previously
     col1, spacer, col2 = st.columns([1.5, 0.1, 2.5])
     with col1:
-        st.subheader("Login")
+        # st.subheader("Login")
         login_page()
     with spacer:
-        st.markdown('<div style="border-left: 3px solid #555; height: 100vh;"></div>', unsafe_allow_html=True)
+        st.markdown('<div style="border-left: 3px solid #555; height: 50vh;"></div>', unsafe_allow_html=True)
     with col2:
-        st.subheader("Signup")
+        # st.subheader("Signup")
         signup_page()
 
 # -----------------------------
@@ -481,6 +481,9 @@ def entry_page():
 # -----------------------------
 def main():
     st.set_page_config(layout="wide")
+    st.markdown("<h1 style='text-align: center; color: black;'>Smart Recommendation Interface (SRI)</h1>", unsafe_allow_html=True)
+    st.markdown('<br>',unsafe_allow_html=True)
+
     if 'logged_in' not in st.session_state:
         st.session_state.logged_in = False
         st.session_state.username = ''
