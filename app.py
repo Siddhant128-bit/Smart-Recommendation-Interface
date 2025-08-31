@@ -522,11 +522,13 @@ def secondary_page():
             else:
                 movie_series_name = st.text_input('Movie/Series Name')
                 date_of_release = st.text_input('Release Date (YYYY-MM-DD)').replace('/','-')
-
-                cache_obj = ut.cache_memory(st.session_state.username)
-                cache_obj.check_for_cache()
-                loaded_data = cache_obj.loaded_dataframe
-
+                try:
+                    cache_obj = ut.cache_memory(st.session_state.username)
+                    cache_obj.check_for_cache()
+                    loaded_data = cache_obj.loaded_dataframe
+                except:
+                    loaded_data=pd.DataFrame(columns=['Title','Upload_Date','Hype_Score','Min','Max'])
+                
                 if st.button("Predict"):
                     try:
                         mask = (
