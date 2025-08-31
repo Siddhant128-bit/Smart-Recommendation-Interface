@@ -640,12 +640,8 @@ def secondary_page():
                         file_name=f"{st.session_state.username}_history.csv",
                         mime="text/csv",
                     )
-                    # if st.button("Delete History"):
-                    #     cache_obj.create_cache()  # reset cache
-                    #     st.success("History cleared!")
-                    #     st.session_state.show_history = False
-                    #     st.experimental_rerun()  #        
-                                         
+                    if st.button("Delete History"):
+                        os.remove(f'User/{st.session_state.username}/{st.session_state.username}_cache.csv')                                         
                     if st.button("Close History"):
                         st.session_state.show_history = False
                         st.experimental_rerun()  # go back to main navigation page
