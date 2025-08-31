@@ -343,39 +343,120 @@ def admin_page():
 # Account Info Page
 # -----------------------------
 def account_page(user):
-    st.title("Account Information")
-    st.write(f"Username: {user.username}")
+    # theme = st.get_option("theme.base")  # 'light' or 'dark'
+    theme = st.context.theme
+    theme=theme['type']
+    # print(theme_info)
+    # Define colors based on theme
+    if theme == "dark":
+        bg_card = "#5C4033"        # brownish
+        bg_section = "#7B5E57"     # lighter brown for reset section
+        text_color = "#f0f0f0"
+        highlight_color = "#FFD700"  # golden accent
+        shadow = "0 4px 12px rgba(0,0,0,0.5)"
+    else:
+        bg_card = "#ffffff"
+        bg_section = "#e6f0ff"
+        text_color = "#333333"
+        highlight_color = "#1f4e8c"
+        shadow = "0 4px 12px rgba(0,0,0,0.2)"
+
+    # Global hover CSS for cards
+    st.markdown(f"""
+    <style>
+    .hover-card {{
+        transition: transform 0.3s, box-shadow 0.3s;
+        border-radius: 15px;
+        padding: 20px;
+        margin-bottom: 15px;
+        background-color: {bg_card};
+        color: {text_color};
+        box-shadow: {shadow};
+    }}
+    .hover-card:hover {{
+        transform: translateY(-5px);
+        box-shadow: 0 8px 20px rgba(0,0,0,0.6);
+    }}
+    </style>
+    """, unsafe_allow_html=True)
+
+    st.markdown(f"<h1 style='text-align:center; color:{text_color};'>Account Information</h1>", unsafe_allow_html=True)
+
+    # User Info Card
+    st.markdown(f"""
+    <div class="hover-card">
+        <h3>Username: {user.username}</h3>
+    </div>
+    """, unsafe_allow_html=True)
 
     # Payment status + 30-day window
     if user.payment_active and user.payment_start:
         expiry = user.payment_start + timedelta(days=30)
         remaining_days = (expiry - datetime.utcnow()).days
         if remaining_days > 0:
-            st.success(f"Payment active. {remaining_days} days remaining.")
+            status_html = f"<p style='color:green;font-weight:bold;'>Payment active. {remaining_days} days remaining.</p>"
             payment_ok = True
         else:
-            st.warning("Payment expired! Please renew to access features.")
+            status_html = "<p style='color:orange;font-weight:bold;'>Payment expired! Please renew to access features.</p>"
             payment_ok = False
             update_payment(user.id, active=0)
     else:
-        st.warning("Payment inactive. Please contact admin.")
+        status_html = "<p style='color:red;font-weight:bold;'>Payment inactive! Please contact admin.</p>"
         payment_ok = False
 
-    # Show current tier
-    tier_str = {0: "None", 1: "Tier 1 (Views)", 2: "Tier 2 (Similar)", 3: "Tier 3 (Both)"}\
-        .get(user.payment_tier or 0, "None")
-    st.info(f"Your Tier: {tier_str}")
+    st.markdown(f"""
+    <div class="hover-card">
+        {status_html}
+    </div>
+    """, unsafe_allow_html=True)
 
-    # Reset password
-    st.subheader("Reset Password")
+    # Tier Info Cards
+    tiers = [
+        {"name":"Tier 1: Views Predictor", "desc":"Predict how much views a video can have in its lifetime uploaded on a certain date", "price":"$50"},
+        {"name":"Tier 2: Trending & Similar", "desc":"Find the best trending movies/series for a month, get similar movies, plus Tier 1 features", "price":"$100"},
+        {"name":"Tier 3: Upload Calendar", "desc":"Generate a complete list of what to upload daily monthly, plus Tier 2 features", "price":"$150"},
+        {"name":"Tier 4: Smart Chatbot", "desc":"Chatbot understands your upload history and provides insights, plus Tier 3 features", "price":"$200"},
+        {"name":"Tier 5: Future Premium", "desc":"All features up to Tier 4, plus more (details TBD)", "price":"$300"},
+    ]
+
+    st.markdown(f"<h2 style='text-align:center; color:{text_color};'>Available Tiers</h2>", unsafe_allow_html=True)
+    for t in tiers:
+        st.markdown(f"""
+        <div class="hover-card">
+            <h3 style='margin-bottom:5px; color:{highlight_color};'>{t['name']}</h3>
+            <p>{t['desc']}</p>
+            <strong>Price: {t['price']}</strong>
+        </div>
+        """, unsafe_allow_html=True)
+
+    # Reset password section
+    st.markdown(f"<h2 style='text-align:center; color:{text_color};'>Reset Password</h2>", unsafe_allow_html=True)
+    st.markdown(f"""
+    <div style="
+        background-color:{bg_section};
+        color:{text_color};
+        padding:20px;
+        border-radius:15px;
+        box-shadow:{shadow};
+        margin-bottom:20px;
+        transition: transform 0.3s, box-shadow 0.3s;
+    " onmouseover="this.style.transform='translateY(-5px)';this.style.boxShadow='0 8px 20px rgba(0,0,0,0.6)';"
+       onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='{shadow}';">
+    """ , unsafe_allow_html=True)
+
     new_pass = st.text_input("New Password", type="password")
     if st.button("Reset Password"):
         if new_pass:
             reset_password(user.id, new_pass)
             st.success("Password updated!")
 
-    return payment_ok
+    st.markdown("</div>", unsafe_allow_html=True)
 
+    # Show current tier
+    tier_str = {0: "None", 1: "Tier 1", 2: "Tier 2", 3: "Tier 3", 4: "Tier 4", 5: "Tier 5"}.get(user.payment_tier or 0, "None")
+    st.info(f"Your Current Tier: {tier_str}")
+
+    return payment_ok
 # -----------------------------
 # User Dashboard
 # -----------------------------
@@ -386,11 +467,36 @@ def secondary_page():
 
     user = get_user(st.session_state.username)
     st.title(f'Welcome {st.session_state.username}')
-    st.sidebar.title("Navigation")
-    page = st.sidebar.radio("Go to", ["Views Predictor", "Similar Movies Recommender", "Account Information"])
 
-    # Expiry / payment checks
+    # ---- Sidebar Style: Move to right ----
+    st.markdown(
+        """
+        <style>
+        /* Move sidebar from left to right */
+        [data-testid="stSidebar"] {
+            left: auto;
+            right: 0;
+            width: 350px; /* fixed width */
+        }
+
+        /* Shift main content so it's not hidden */
+        [data-testid="stSidebar"] ~ div[data-testid="stAppViewContainer"] {
+            margin-left: 0; /* remove left space */
+            margin-right: 350px; /* leave space for right sidebar */
+        }
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
+
+    # ---- Sidebar content ----
+    with st.sidebar:
+        st.title("Navigation")
+        page = st.radio("Go to", ["Views Predictor", "Trending & Similar", "Account Information"])
+
+    # ---- Expiry / payment checks ----
     payment_ok = False
+    # page='Views Predictor'
     if page == "Account Information":
         payment_ok = account_page(user)
     else:
@@ -400,86 +506,158 @@ def secondary_page():
         else:
             payment_ok = True
 
-        # Gate by tier:
-        # Tier1 -> Views only; Tier2 -> Similar only; Tier3 -> both.
-        if page == "Views Predictor":
-            if not payment_ok or user.payment_tier not in (1, 3):
-                st.info("Your tier does not include Views Predictor. Please contact admin.")
+    # Gate by tier
+    if page == "Views Predictor":
+        if not payment_ok or user.payment_tier not in (1, 3):
+            st.info("Your tier does not include Views Predictor. Please contact admin.")
+        else:
+            st.subheader("Views Predictor")
+            model_status = ut.check_model_training_status(user.username)
+            if model_status == False:
+                st.text('Model needs to be updated please train the model first ')
+                if st.button('Train Model'):
+                    mt.model_train(f'User/{user.username}', f'{user.username}.csv')
+                    model_status = True
+                    st.rerun()    
             else:
-                st.subheader("Views Predictor")
-                model_status = ut.check_model_training_status(user.username)
-                if model_status==False:
-                    st.text('Model needs to be updated please train the model first ')
-                    if st.button('Train Model'):
-                        mt.model_train(f'User/{user.username}', f'{user.username}.csv')
-                        model_status = True
-                        st.rerun()    
-                else:
-                    movie_series_name = st.text_input('Movie/Series Name')
-                    date_of_release = st.text_input('Release Date (YYYY-MM-DD)').replace('/','-')
-                    if st.button('Predict'):
-                        try:
+                movie_series_name = st.text_input('Movie/Series Name')
+                date_of_release = st.text_input('Release Date (YYYY-MM-DD)').replace('/','-')
+
+                cache_obj = ut.cache_memory(st.session_state.username)
+                cache_obj.check_for_cache()
+                loaded_data = cache_obj.loaded_dataframe
+
+                if st.button("Predict"):
+                    try:
+                        mask = (
+                            loaded_data["Title"].str.lower().eq(movie_series_name.lower())
+                            & loaded_data["Upload_Date"].eq(date_of_release)
+                        )
+                        found_data = loaded_data.loc[mask]
+
+                        if not found_data.empty:
+                            row = found_data.iloc[0]
+                            results = {
+                                "title": row["Title"],
+                                "release date": row["Upload_Date"],
+                                "hype score": row["Hype_Score"],
+                                "minimum_view": row["Min"],
+                                "max": row["Max"],
+                            }
+                        else:
                             results = mt.model_inference(
-                                movie_series_name, date_of_release,
-                                f'User/{user.username}', user.username
+                                movie_series_name,
+                                date_of_release,
+                                f"User/{user.username}",
+                                user.username,
+                            )
+                            cache_obj.dump_data(
+                                results["title"],
+                                results["release date"],
+                                results["hype score"],
+                                results["minimum_view"],
+                                results["max"],
                             )
 
-                            # Fancy display
-                            st.success("✅ Prediction Successful!")
-                            st.markdown(
-                                f"""
-                                <style>
+                        # ---- Render results ----
+                        st.success("✅ Prediction Successful!")
+                        st.markdown(
+                            f"""
+                            <style>
+                            .movie-card {{
+                                padding: 20px;
+                                border-radius: 12px;
+                                margin-top: 15px;
+                                margin-bottom: 15px;
+                                transition: transform 0.3s, box-shadow 0.3s, background-color 0.3s, color 0.3s;
+                                box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+                            }}
+                            .movie-card:hover {{
+                                transform: translateY(-5px);
+                                box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+                            }}
+
+                            /* Light mode */
+                            @media (prefers-color-scheme: light) {{
                                 .movie-card {{
-                                    padding: 20px;
-                                    border-radius: 12px;
-                                    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-                                    margin-top: 15px;
-                                    transition: background-color 0.3s, color 0.3s;
+                                    background-color: #ffffff;
+                                    color: #333;
                                 }}
-
-                                /* Light mode */
-                                @media (prefers-color-scheme: light) {{
-                                    .movie-card {{
-                                        background-color: #f9f9f9;
-                                        color: #333;
-                                    }}
+                                .movie-card:hover {{
+                                    background-color: #f5f5f5;
                                 }}
+                            }}
 
-                                /* Dark mode */
-                                @media (prefers-color-scheme: dark) {{
-                                    .movie-card {{
-                                        background-color: #1e1e1e;
-                                        color: #f5f5f5;
-                                    }}
+                            /* Dark mode */
+                            @media (prefers-color-scheme: dark) {{
+                                .movie-card {{
+                                    background-color: #5C4033;  /* brownish dark mode */
+                                    color: #f5f5f5;
+                                    box-shadow: 0 4px 12px rgba(0,0,0,0.5);
                                 }}
-                                </style>
+                                .movie-card:hover {{
+                                    background-color: #6f4e37;
+                                    box-shadow: 0 8px 20px rgba(0,0,0,0.7);
+                                }}
+                            }}
+                            </style>
 
-                                <div class="movie-card">
-                                    <h3>🎬 {results['title']}</h3>
-                                    <p><b>📅 Release Date:</b> {results['release date']}</p>
-                                    <p><b>💥 Hype Score:</b> {results['hype score']}</p>
-                                </div>
-                                """,
-                                unsafe_allow_html=True
-                            )
+                            <div class="movie-card">
+                                <h3>🎬 {results['title']}</h3>
+                                <p><b>📅 Release Date:</b> {results['release date']}</p>
+                                <p><b>💥 Hype Score:</b> {results['hype score']}</p>
+                            </div>
+                            """,
+                            unsafe_allow_html=True
+                        )
 
-                            # Optional: metrics side by side
-                            col1, col2 = st.columns(2)
-                            col1.metric("Min Views", results["minimum_view"])
-                            col2.metric("Max Views", results["max"])
+                        col1, col2 = st.columns(2)
+                        col1.metric("Min Views", results["minimum_view"])
+                        col2.metric("Max Views", results["max"])
+
+                    except Exception as e:
+                        st.error(f"Inference failed: {e}")
+
+                if st.button("View History"):
                     
-                        except Exception as e:
-                            st.error(f"Inference failed: {e}")
-
+                    st.session_state.show_history = True
                     
-        elif page == "Similar Movies Recommender":
-            if not payment_ok or user.payment_tier not in (2, 3):
-                st.info("Your tier does not include Similar Movies Recommender. Please contact admin.")
-            else:
-                st.subheader("Similar Movies Recommender")
-                st.write("Feature active for your tier.")
-                # Placeholder: integrate your recommender UI here
+                    st.subheader("Prediction History")
+                    # Load cached data
+                    cache_obj = ut.cache_memory(st.session_state.username)
+                    cache_obj.check_for_cache()
+                    loaded_data = cache_obj.loaded_dataframe
 
+                    st.dataframe(loaded_data, use_container_width=True)
+
+                    # Download CSV
+                    csv = loaded_data.to_csv(index=False).encode("utf-8")
+                    st.download_button(
+                        label="Download History as CSV",
+                        data=csv,
+                        file_name=f"{st.session_state.username}_history.csv",
+                        mime="text/csv",
+                    )
+                    # if st.button("Delete History"):
+                    #     cache_obj.create_cache()  # reset cache
+                    #     st.success("History cleared!")
+                    #     st.session_state.show_history = False
+                    #     st.experimental_rerun()  #        
+                                         
+                    if st.button("Close History"):
+                        st.session_state.show_history = False
+                        st.experimental_rerun()  # go back to main navigation page
+                        st.rerun()
+
+    elif page == "Trending & Similar":
+        if not payment_ok or user.payment_tier not in (2, 3):
+            st.info("Your tier does not include Trending & Similar Movies Recommender. Please contact admin.")
+        else:
+            st.subheader("Similar Movies Recommender")
+            st.write("Feature active for your tier.")
+            # Placeholder: recommender UI here
+
+    # ---- Logout ----
     if st.button("Logout"):
         st.session_state.logged_in = False
         st.session_state.username = None

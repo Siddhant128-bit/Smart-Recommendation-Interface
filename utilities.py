@@ -1,6 +1,5 @@
 import os
 import pandas as pd
-import model_work
 
 class Create_User:
     def __init__(self,username,dataframe):
@@ -19,4 +18,39 @@ def check_model_training_status(user_name):
     else: 
         return True
     
+
+class cache_memory:
+    def __init__(self,user_name):
+        self.user_name=user_name
     
+    def create_cache(self):
+        df=pd.DataFrame(columns=['Title','Upload_Date','Hype_Score','Min','Max'])
+        df.to_csv(f'User/{self.user_name}/{self.user_name}_cache.csv',index=False)
+
+    def load_cache(self):
+        df=pd.read_csv(f'User/{self.user_name}/{self.user_name}_cache.csv')
+        self.loaded_dataframe=df
+    
+    def dump_data(self,movie_name,date,trend_score,min_view,max_view):
+        df = pd.DataFrame({
+            'Title': [movie_name],
+            'Upload_Date': [date],
+            'Hype_Score': [trend_score],
+            'Min': [min_view],
+            'Max': [max_view]
+        })
+
+        print(df)
+        df.to_csv(f'User/{self.user_name}/{self.user_name}_cache.csv',mode='a',header=False,index=False)
+        print('Saving Successful')
+        print('#'*30)
+
+    def check_for_cache(self):
+        
+        if os.path.exists(f'User/{self.user_name}/{self.user_name}_cache.csv'):
+            self.load_cache()
+        else: 
+            self.create_cache()
+    
+
+
