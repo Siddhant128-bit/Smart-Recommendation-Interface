@@ -676,7 +676,7 @@ def secondary_page():
 
             # Fancy display function
             def display_movies(movie_list):
-                for rank, (title, link) in enumerate(movie_list, start=1):
+                for rank, (title, link) in enumerate(movie_list, start=0):
                     with st.container():
                         st.markdown(
                             f"""
