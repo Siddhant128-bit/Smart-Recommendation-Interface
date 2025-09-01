@@ -14,3 +14,4 @@ streamlit==1.48.1
 torch==2.8.0
 google-genai
 bcrypt
+beautifulsoup4
