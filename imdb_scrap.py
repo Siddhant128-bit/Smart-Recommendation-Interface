@@ -1,7 +1,7 @@
 import requests
 from bs4 import BeautifulSoup
 import json
-import imdb
+
 
 def get_top_250_movies():
     url = "https://www.imdb.com/chart/top/"
