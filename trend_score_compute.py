@@ -93,7 +93,7 @@ def get_google_trend(title, target_date_str, window=30, max_retries=5, initial_d
             forecast = m.predict(future)
             closest_forecast = forecast.iloc[(forecast['ds'] - target_date).abs().argsort()[:1]]
             yhat = float(closest_forecast['yhat'].values[0])
-
+            print(f'Trend Score obtained from forecast is {yhat}')
             # Clip to [0,100]
             return max(0, min(100, yhat))
 
@@ -113,8 +113,8 @@ def get_google_trend(title, target_date_str, window=30, max_retries=5, initial_d
 # Example usage
 # -----------------------------
 if __name__ == "__main__":
-    title = "The matrix"
-    date_str = "2025-9-7"
+    title = "Schindler's List"
+    date_str = "2025-09-07"
     time.sleep(30)
     trend_score = get_google_trend(title, date_str,initial_delay=30,window=180)
 
