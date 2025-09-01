@@ -10,7 +10,7 @@ import model_work as mt
 import os
 import io
 import shutil
-
+import imdb_scrap as i_s
 # -----------------------------
 # Database setup
 # -----------------------------
@@ -492,7 +492,7 @@ def secondary_page():
     # ---- Sidebar content ----
     with st.sidebar:
         st.title("Navigation")
-        page = st.radio("Go to", ["Views Predictor", "Trending & Similar", "Account Information"])
+        page = st.radio("Go to", ["Views Predictor", "Trending", "Account Information"])
 
     # ---- Expiry / payment checks ----
     payment_ok = False
@@ -508,7 +508,7 @@ def secondary_page():
 
     # Gate by tier
     if page == "Views Predictor":
-        if not payment_ok or user.payment_tier not in (1, 3):
+        if not payment_ok or user.payment_tier not in (1, 2, 3):
             st.info("Your tier does not include Views Predictor. Please contact admin.")
         else:
             st.subheader("Views Predictor")
@@ -648,12 +648,64 @@ def secondary_page():
                         st.experimental_rerun()  # go back to main navigation page
                         st.rerun()
 
-    elif page == "Trending & Similar":
-        if not payment_ok or user.payment_tier not in (2, 3):
+    elif page == "Trending":
+        if not payment_ok or user.payment_tier not in (2,3):
             st.info("Your tier does not include Trending & Similar Movies Recommender. Please contact admin.")
         else:
-            st.subheader("Similar Movies Recommender")
-            st.write("Feature active for your tier.")
+            st.set_page_config(page_title="Trendy Movie Explorer", layout="wide")
+
+            # --- Title ---
+            st.markdown(
+                """
+                <h1 style="text-align:center; margin-bottom:0;">🎬 Trendy Movie Explorer</h1>
+                <p style="text-align:center; font-size:18px; margin-top:5px;">
+                    Discover <b>what’s trending now</b> 🔥 and explore the <b>IMDb Top 250 all-time classics</b> 🏆<br>
+                    ⚠️Note: Some movies might not have released in ott ! 
+                </p>
+                <hr style="margin: 10px 0 25px 0;">
+                """,
+                unsafe_allow_html=True,
+            )
+
+            # Sidebar navigation
+            st.subheader("Options")
+            choice = st.radio("Choose a list to explore:", ["None","Trending Now!", "Top 250 IMDb!"],index=0)
+
+            # Container for results
+            results_container = st.container()
+
+            # Fancy display function
+            def display_movies(movie_list):
+                for rank, (title, link) in enumerate(movie_list, start=1):
+                    with st.container():
+                        st.markdown(
+                            f"""
+                            <div style="
+                                background-color:#f9f9f9;
+                                border-radius:12px;
+                                padding:12px;
+                                margin:6px 0;
+                                box-shadow:0 2px 6px rgba(0,0,0,0.1);
+                            ">
+                                <b style="font-size:16px;">{rank}. <a href="{link}" target="_blank">{title}</a></b>
+                            </div>
+                            """,
+                            unsafe_allow_html=True
+                        )
+
+            # Example: calling your scraping functions
+            # i_s is assumed to be your scraper module
+            if choice == "Trending Now!":
+                st.subheader("🔥 Trending Movies")
+                movie_list = i_s.get_trending_movies()   # [(title, link), ...]
+                display_movies(movie_list)
+
+            elif choice == "Top 250 IMDb!":
+                st.subheader("🏆 IMDb Top 250 Movies")
+                movie_list = i_s.get_top_250_movies()    # [(title, link), ...]
+                display_movies(movie_list)
+            else: 
+                st.text('Select 1 and Get the list you want.')
             # Placeholder: recommender UI here
 
     # ---- Logout ----
@@ -682,7 +734,7 @@ def entry_page():
 # Main
 # -----------------------------
 def main():
-    st.set_page_config(layout="wide")
+    st.set_page_config(page_title="Smart Recommendation Interface !",layout="wide",page_icon="🤖",)
     st.markdown(
         """
         <style>
@@ -714,7 +766,7 @@ def main():
         }
         </style>
 
-        <h1 class="sri-title">Smart Recommendation Interface (SRI)</h1>
+        <h1 class="sri-title"> 🤖 Smart Recommendation Interface (SRI) 🤖</h1>
         <br>
         <hr class="sri-divider">
         """,
