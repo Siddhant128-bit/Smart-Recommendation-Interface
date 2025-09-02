@@ -671,12 +671,10 @@ def secondary_page():
             st.subheader("Options")
             choice = st.radio("Choose a list to explore:", ["None","Trending Now!", "Top 250 IMDb!"],index=0)
 
-            # Container for results
-            results_container = st.container()
 
             # Fancy display function
             def display_movies(movie_list):
-                for rank, (title, link) in enumerate(movie_list, start=0):
+                for rank, (title, link,rating) in enumerate(movie_list, start=1):
                     with st.container():
                         st.markdown(
                             f"""
@@ -687,22 +685,20 @@ def secondary_page():
                                 margin:6px 0;
                                 box-shadow:0 2px 6px rgba(0,0,0,0.1);
                             ">
-                                <b style="font-size:16px;">{rank}. <a href="{link}" target="_blank">{title}</a></b>
+                                <b style="font-size:16px;">{rank}. <a href="{link}" target="_blank">{title}</a> <a>   Rating: {rating}</b>
                             </div>
                             """,
                             unsafe_allow_html=True
                         )
 
-            # Example: calling your scraping functions
-            # i_s is assumed to be your scraper module
             if choice == "Trending Now!":
                 st.subheader("🔥 Trending Movies")
-                movie_list = i_s.get_trending_movies()   # [(title, link), ...]
+                movie_list = i_s.get_trending_movies()   
                 display_movies(movie_list)
 
             elif choice == "Top 250 IMDb!":
                 st.subheader("🏆 IMDb Top 250 Movies")
-                movie_list = i_s.get_top_250_movies()    # [(title, link), ...]
+                movie_list = i_s.get_top_250_movies()    
                 display_movies(movie_list)
             else: 
                 st.text('Select 1 and Get the list you want.')
