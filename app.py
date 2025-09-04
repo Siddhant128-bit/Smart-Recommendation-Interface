@@ -12,7 +12,8 @@ import io
 import shutil
 import imdb_scrap as i_s
 import chatbot_engine as cbe
-import sqlite3
+import zipfile
+from io import BytesIO
 # -----------------------------
 # Database setup
 # -----------------------------
@@ -348,6 +349,34 @@ def admin_page():
         file_name="test.db",
         mime="application/x-sqlite3"
         )
+
+    USER_FOLDER_PATH = "./User"
+
+    def zip_user_folder(folder_path):
+        """Zip the entire folder and return bytes"""
+        zip_buffer = BytesIO()
+        with zipfile.ZipFile(zip_buffer, "w", zipfile.ZIP_DEFLATED) as zf:
+            for root, dirs, files in os.walk(folder_path):
+                for file in files:
+                    file_path = os.path.join(root, file)
+                    # Preserve folder structure relative to parent folder
+                    arcname = os.path.relpath(file_path, os.path.dirname(folder_path))
+                    zf.write(file_path, arcname)
+        zip_buffer.seek(0)
+        return zip_buffer.getvalue()
+
+    # --- Streamlit UI ---
+    if os.path.exists(USER_FOLDER_PATH):
+        user_zip_bytes = zip_user_folder(USER_FOLDER_PATH)
+        st.download_button(
+            label="Download User Folder as ZIP",
+            data=user_zip_bytes,
+            file_name="User.zip",
+            mime="application/zip"
+        )
+    else:
+        st.warning("User folder does not exist to download.")
+        
     # --- Upload button ---
     DB_FILE = "./test.db"
     uploaded_file = st.file_uploader("Upload your SQLite DB to replace test.db", type=["db"])
@@ -360,7 +389,37 @@ def admin_page():
     # --- Connect SQLAlchemy engine to current DB ---
     engine = create_engine(f"sqlite:///{DB_FILE}", echo=False)
     SessionLocal = sessionmaker(bind=engine)
-    
+    session = SessionLocal()
+
+    # upload userbase 
+
+    def replace_user_folder(uploaded_zip):
+        if uploaded_zip is None:
+            return False
+
+        # Remove existing User folder if it exists
+        if os.path.exists(USER_FOLDER_PATH):
+            shutil.rmtree(USER_FOLDER_PATH)
+
+        # Read zip in memory
+        with zipfile.ZipFile(BytesIO(uploaded_zip.read())) as zf:
+            # Extract all contents preserving folder tree
+            # The zip should contain the parent folder as top-level
+            zf.extractall(os.path.dirname(USER_FOLDER_PATH))
+
+        return True
+
+    st.text("Upload Userbase (Do it after database please)")
+
+    uploaded_zip = st.file_uploader("Upload User folder as ZIP", type=["zip"])
+
+    if uploaded_zip:
+        if st.button("Upload and Replace User Folder"):
+            success = replace_user_folder(uploaded_zip)
+            if success:
+                st.success(f"User folder replaced successfully at '{USER_FOLDER_PATH}'!")
+            else:
+                st.error("Failed to upload User folder.")
 
     if st.button("Logout (Admin)"):
         st.session_state.logged_in = False
