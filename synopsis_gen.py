@@ -3,7 +3,6 @@ from dotenv import load_dotenv
 from google import genai
 from google.genai import types
 import pandas as pd
-
 # Load API Key from .env
 load_dotenv()
 API_KEY = os.environ.get("API_KEY")

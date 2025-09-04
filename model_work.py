@@ -256,7 +256,7 @@ def model_inference(movie_name,example_date,parent_directory,user_name):
         time.sleep(45)
         print(f'target date: {example_date}')
         
-        trend_score = int(get_google_trend(movie_name, example_date, initial_delay=30,window=180))
+        trend_score = int(get_google_trend(movie_name, example_date, initial_delay=3,max_retries=10,window=180))
         # trend_score=45.22
 
         dt = datetime.strptime(example_date, "%Y-%m-%d")

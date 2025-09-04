@@ -11,6 +11,7 @@ import os
 import io
 import shutil
 import imdb_scrap as i_s
+import chatbot_engine as cbe
 # -----------------------------
 # Database setup
 # -----------------------------
@@ -30,7 +31,8 @@ class User(Base):
         Tier semantics:
           * 1: Views Predictor only
           * 2: Similar Movies only
-          * 3: Both features
+          * 3: Calender Formation
+          * 4: Chatbot that understands your youtube channel
     """
     __tablename__ = 'users'
     id = Column(Integer, primary_key=True)
@@ -98,7 +100,7 @@ def set_tier_and_activate(user_id, tier: int):
         user = session.query(User).filter_by(id=user_id).first()
         if user:
             user.payment_tier = tier
-            user.payment_active = 1 if tier in (1, 2, 3) else 0
+            user.payment_active = 1 if tier in (1, 2, 3,4) else 0
             user.payment_start = datetime.utcnow() if user.payment_active == 1 else None
             if user.status != "paused":
                 user.status = "active"
@@ -247,8 +249,8 @@ def admin_page():
         if user.username.lower() == "admin" or user.status == "pending":
             continue
 
-        tier_label = {0: "None", 1: "Tier 1 (Views)", 2: "Tier 2 (Similar)", 3: "Tier 3 (Both)"}
-        current_tier = user.payment_tier if user.payment_tier in (0,1,2,3) else 0
+        tier_label = {0: "None",1: "Tier 1 (Views)", 2: "Tier 2 Similar Trendy Movies", 3: "Tier 3 Upload Calender", 4:"Tier 4 Chatbot"}
+        current_tier = user.payment_tier if user.payment_tier in (0,1,2,3,4) else 0
 
         st.markdown(
             f"**{user.username}** | Status: `{user.status}` | "
@@ -263,9 +265,9 @@ def admin_page():
             # Tier selection
             new_tier = st.selectbox(
                 "Set Tier",
-                options=[1, 2, 3],
-                format_func=lambda x: {1: "Tier 1 (Views)", 2: "Tier 2 (Similar)", 3: "Tier 3 (Both)"}[x],
-                index={1:0, 2:1, 3:2}.get(current_tier if current_tier in (1,2,3) else 1),
+                options=[1, 2, 3,4],
+                format_func=lambda x: {1: "Tier 1 (Views)", 2: "Tier 2 Similar Trendy Movies", 3: "Tier 3 Upload Calender", 4:"Tier 4 Chatbot"}[x],
+                index={1:0, 2:1, 3:2 ,4:3}.get(current_tier if current_tier in (1,2,3,4) else 1),
                 key=f"tier_sel_{user.id}"
             )
             if st.button("Set Tier & Activate", key=f"set_tier_{user.id}"):
@@ -466,7 +468,6 @@ def secondary_page():
         return
 
     user = get_user(st.session_state.username)
-    st.title(f'Welcome {st.session_state.username}')
 
     # ---- Sidebar Style: Move to right ----
     st.markdown(
@@ -491,8 +492,8 @@ def secondary_page():
 
     # ---- Sidebar content ----
     with st.sidebar:
-        st.title("Navigation")
-        page = st.radio("Go to", ["Views Predictor", "Trending", "Account Information"])
+        st.title("🤖 SRI 🤖")
+        page = st.radio("Go to", ["Views Predictor", "Trending","Chatbot","Account Information"])
 
     # ---- Expiry / payment checks ----
     payment_ok = False
@@ -508,7 +509,7 @@ def secondary_page():
 
     # Gate by tier
     if page == "Views Predictor":
-        if not payment_ok or user.payment_tier not in (1, 2, 3):
+        if not payment_ok or user.payment_tier not in (1, 2, 3,4):
             st.info("Your tier does not include Views Predictor. Please contact admin.")
         else:
             st.subheader("Views Predictor")
@@ -649,7 +650,7 @@ def secondary_page():
                         st.rerun()
 
     elif page == "Trending":
-        if not payment_ok or user.payment_tier not in (2,3):
+        if not payment_ok or user.payment_tier not in (2,3,4):
             st.info("Your tier does not include Trending & Similar Movies Recommender. Please contact admin.")
         else:
             st.set_page_config(page_title="Trendy Movie Explorer", layout="wide")
@@ -703,6 +704,88 @@ def secondary_page():
             else: 
                 st.text('Select 1 and Get the list you want.')
             # Placeholder: recommender UI here
+    elif page == "Chatbot":
+        if not payment_ok or user.payment_tier not in (4,5):
+            st.info("Your tier does not include Chatbot. Please contact admin.")
+        else:
+            # 🎭 Smart Recommendation Interface (SRI) - Chatbot Page
+
+            st.set_page_config(page_title="🤖 SRI Chatbot", layout="wide")
+
+            # Title & Subtitle
+            st.markdown(
+                """
+                <h1 style='text-align: center; color: #2E86AB;'>🤖 Miss SRI </h1>
+                <p style='text-align: center; font-size:18px; color: gray;'>
+                    Chat with your personal AI assistant Miss SRI about your YouTube channel 🎬<br>
+                    Ask about genres, performance, or even future predictions!
+                </p>
+                <hr>
+                """,
+                unsafe_allow_html=True
+            )
+
+            # Initialize chatbot state
+            system_prompt, history, user_data = cbe.initialize_chatbot(st.session_state.username)
+
+            # Sidebar
+            with st.sidebar:
+                st.header("⚙️ Chat Settings")
+                st.write("Manage your chat session here.")
+                clear_chat = st.button("🗑️ Clear Conversation")
+                if clear_chat:
+                    history.clear()
+                    st.session_state.chat_history = []
+                    st.success("Chat history cleared!")
+
+                st.markdown("---")
+
+            # Main Chat Area
+            st.subheader("💬 Talk to SRI")
+
+            # Container for chat messages
+            chat_container = st.container()
+
+            if "chat_history" not in st.session_state:
+                st.session_state.chat_history = []
+
+            # User input box (at bottom)
+            with st.form(key="chat_form", clear_on_submit=True):
+                user_message = st.text_input("Type your message:", placeholder="E.g. How are my war movies doing? 🎥")
+                submit = st.form_submit_button("Send 🚀")
+
+            if submit and user_message.strip():
+                # Append user message to history
+                st.session_state.chat_history.append({"role": "user", "content": user_message})
+
+                # Get bot response
+                bot_response = cbe.ask_gemini(user_message, history, st.session_state.username, user_data)
+
+                # Append bot message
+                st.session_state.chat_history.append({"role": "assistant", "content": bot_response})
+
+            # Display chat
+            with chat_container:
+                for chat in st.session_state.chat_history:
+                    if chat["role"] == "user":
+                        st.markdown(
+                            f"""
+                            <div style="background-color:#1E90FF; color:white; padding:10px; border-radius:12px; margin:5px; text-align:right;">
+                                <b>🧑 You:</b> {chat['content']}
+                            </div>
+                            """,
+                            unsafe_allow_html=True
+                        )
+                    else:
+                        st.markdown(
+                            f"""
+                            <div style="background-color:#800080; color:white; padding:10px; border-radius:12px; margin:5px; text-align:left;">
+                                <b>🤖 SRI:</b> {chat['content']}
+                            </div>
+                            """,
+                            unsafe_allow_html=True
+                        )
+
 
     # ---- Logout ----
     if st.button("Logout"):
