@@ -12,6 +12,7 @@ import io
 import shutil
 import imdb_scrap as i_s
 import chatbot_engine as cbe
+import sqlite3
 # -----------------------------
 # Database setup
 # -----------------------------
@@ -336,9 +337,31 @@ def admin_page():
                     except Exception as e:
                         st.error(f"Retrain failed: {e}")
 
-        if st.button('Download Database'):
-            st.text('going to download Database')
     st.markdown("---")
+
+    with open("test.db", "rb") as f:
+        db_bytes = f.read()
+
+    st.download_button(
+        label="Download Database",
+        data=db_bytes,
+        file_name="test.db",
+        mime="application/x-sqlite3"
+        )
+    # --- Upload button ---
+    DB_FILE = "./test.db"
+    uploaded_file = st.file_uploader("Upload your SQLite DB to replace test.db", type=["db"])
+    if uploaded_file:
+        # Replace existing test.db seamlessly
+        with open(DB_FILE, "wb") as f:
+            f.write(uploaded_file.read())
+        st.success("Database replaced successfully!")
+
+    # --- Connect SQLAlchemy engine to current DB ---
+    engine = create_engine(f"sqlite:///{DB_FILE}", echo=False)
+    SessionLocal = sessionmaker(bind=engine)
+    
+
     if st.button("Logout (Admin)"):
         st.session_state.logged_in = False
         st.session_state.username = None
