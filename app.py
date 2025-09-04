@@ -318,10 +318,12 @@ def admin_page():
                         
                         # If folder already exists, remove it completely
                         if os.path.exists(user_dir):
-                            shutil.rmtree(user_dir)  
+                            for file in os.listdir(user_dir):
+                                if not file.endswith('_cache.csv') or not file.endswith('history.json'):
+                                    os.remove(os.path.join(user_dir,file))  
                         
                         # Now save new dataset
-                        admin_replace_dataset(user.username, df)
+                        df.to_csv(f'{user_dir}/{user.username}.csv')
                         st.success("Dataset updated.")
                     except Exception as e:
                         st.error(f"Failed to update dataset: {e}")
@@ -334,6 +336,8 @@ def admin_page():
                     except Exception as e:
                         st.error(f"Retrain failed: {e}")
 
+        if st.button('Download Database'):
+            st.text('going to download Database')
     st.markdown("---")
     if st.button("Logout (Admin)"):
         st.session_state.logged_in = False
