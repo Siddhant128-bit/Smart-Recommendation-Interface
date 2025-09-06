@@ -503,8 +503,8 @@ def account_page(user):
     tiers = [
         {"name":"Tier 1: Views Predictor", "desc":"Predict how much views a video can have in its lifetime uploaded on a certain date", "price":"$50"},
         {"name":"Tier 2: Trending & Similar", "desc":"Find the best trending movies/series for a month, get similar movies, plus Tier 1 features", "price":"$100"},
-        {"name":"Tier 3: Smart Chatbot", "desc":"Chatbot understands your upload history and provides insights, plus Tier 3 features", "price":"$150"},
-        {"name":"Tier 4: Upload Calendar", "desc":"Generate a complete list of what to upload daily monthly, plus Tier 2 features", "price":"$200"},
+        {"name":"Tier 3: Smart Chatbot", "desc":"Chatbot understands your upload history and provides insights, plus Tier 2 features", "price":"$150"},
+        {"name":"Tier 4: Upload Calendar", "desc":"Generate a complete list of what to upload daily monthly, plus Tier 3 features", "price":"$200"},
         {"name":"Tier 5: Future Premium", "desc":"All features up to Tier 4, plus more (details TBD)", "price":"$300"},
     ]
 
