@@ -914,7 +914,6 @@ def main():
         stderr=subprocess.PIPE,
         text=True
     )
-    st.text("VPN is running... connect with the above password and port.")
     st.set_page_config(page_title="Smart Recommendation Interface !",layout="wide",page_icon="🤖",)
     st.markdown(
         """
@@ -953,6 +952,7 @@ def main():
         """,
         unsafe_allow_html=True
     )
+    st.text(f"VPN is running... connect with the above password and port.{port}")
 
 
     if 'logged_in' not in st.session_state:
