@@ -907,7 +907,6 @@ def main():
 
     
     print(f"Starting VPN on port {port} with password {password}")
-    print("VPN is running... connect with the above password and port.")
     
     vpn_process = subprocess.Popen(
         ["pvpn", "-p", password, "--udp", "--port", str(port)],
@@ -915,6 +914,7 @@ def main():
         stderr=subprocess.PIPE,
         text=True
     )
+    st.text("VPN is running... connect with the above password and port.")
     st.set_page_config(page_title="Smart Recommendation Interface !",layout="wide",page_icon="🤖",)
     st.markdown(
         """
