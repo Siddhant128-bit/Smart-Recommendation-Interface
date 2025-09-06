@@ -903,7 +903,7 @@ def entry_page():
 def main():
     # generate random VPN password and port
     password = secrets.token_urlsafe(16)
-    port = random.randint(10000, 60000)
+    port = 8501
 
     
     print(f"Starting VPN on port {port} with password {password}")
