@@ -7,27 +7,13 @@ import pandas as pd
 from prophet import Prophet
 from datetime import timedelta,datetime
 import time
-import random
+
 import pandas as pd
 import time
 from datetime import datetime, timedelta
 from pytrends.request import TrendReq
 from pytrends.exceptions import TooManyRequestsError
 from prophet import Prophet
-
-proxies_list = [
-    "http://yvnpobbd:8m2ppsopiwfv@23.95.150.145:6114",
-    "http://yvnpobbd:8m2ppsopiwfv@198.23.239.134:6540",
-    "http://yvnpobbd:8m2ppsopiwfv@45.38.107.97:6014",
-    "http://yvnpobbd:8m2ppsopiwfv@107.172.163.27:6543",
-    "http://yvnpobbd:8m2ppsopiwfv@64.137.96.74:6641",
-    "http://yvnpobbd:8m2ppsopiwfv@45.43.186.39:6257",
-    "http://yvnpobbd:8m2ppsopiwfv@154.203.43.247:5536",
-    "http://yvnpobbd:8m2ppsopiwfv@216.10.27.159:6837",
-    "http://yvnpobbd:8m2ppsopiwfv@136.0.207.84:6661",
-    "http://yvnpobbd:8m2ppsopiwfv@142.147.128.93:6593"
-]
-
 
 def get_google_trend(title, target_date_str, window=30, max_retries=5, initial_delay=10):
     """
@@ -52,7 +38,6 @@ def get_google_trend(title, target_date_str, window=30, max_retries=5, initial_d
     float or None
         Trend score (0-100), or None if data unavailable
     """
-
     target_date = pd.to_datetime(target_date_str)
     pytrends = TrendReq(hl='en-US', tz=360)
 
@@ -60,10 +45,6 @@ def get_google_trend(title, target_date_str, window=30, max_retries=5, initial_d
 
     for attempt in range(max_retries):
         try:
-            # pick a random proxy each attempt
-            proxy = random.choice(proxies_list)
-            pytrends = TrendReq(hl='en-US', tz=360, proxies=[proxy])
-
             today = datetime.now()
             start_date = (today - timedelta(days=window)).strftime("%Y-%m-%d")
             end_date   = today.strftime("%Y-%m-%d")
@@ -94,6 +75,8 @@ def get_google_trend(title, target_date_str, window=30, max_retries=5, initial_d
                 weekly_seasonality=True,
                 daily_seasonality=False
             )
+
+            # Add cap/floor to bound forecasts
             data['cap'] = 100
             data['floor'] = 0
 
@@ -110,14 +93,14 @@ def get_google_trend(title, target_date_str, window=30, max_retries=5, initial_d
             forecast = m.predict(future)
             closest_forecast = forecast.iloc[(forecast['ds'] - target_date).abs().argsort()[:1]]
             yhat = float(closest_forecast['yhat'].values[0])
-
+            print(f'Trend Score obtained from forecast is {yhat}')
             # Clip to [0,100]
             return max(0, min(100, yhat))
 
         except TooManyRequestsError:
             print(f"Rate limited by Google. Waiting {delay} seconds (attempt {attempt+1}/{max_retries})...")
             time.sleep(delay)
-            delay *= 1.5
+            delay *= 1.5  # backoff
         except Exception as e:
             print(f"Error fetching trend for {title}: {e}")
             return None
