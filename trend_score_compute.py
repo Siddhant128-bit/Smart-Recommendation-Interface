@@ -92,7 +92,6 @@ def get_google_trend(title, target_date_str, window=30, max_retries=5, initial_d
             delay *= 1.5
         except Exception as e:
             print(f"Error fetching trend for {title}: {e}")
-            raise
             # return None
 
     print(f"Failed to fetch trend for {title} after {max_retries} retries.")
