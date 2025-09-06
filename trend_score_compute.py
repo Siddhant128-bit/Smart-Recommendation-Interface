@@ -1,9 +1,5 @@
-import subprocess, secrets, random
-
-
-
-print("VPN is running... connect with the above password and port.")
-
+# Required packages:
+# pip install pytrends pandas prophet
 
 from pytrends.request import TrendReq
 from pytrends.exceptions import TooManyRequestsError
@@ -18,6 +14,7 @@ from datetime import datetime, timedelta
 from pytrends.request import TrendReq
 from pytrends.exceptions import TooManyRequestsError
 from prophet import Prophet
+import subprocess, secrets, random
 
 def get_google_trend(title, target_date_str, window=30, max_retries=5, initial_delay=10):
     """
@@ -42,9 +39,6 @@ def get_google_trend(title, target_date_str, window=30, max_retries=5, initial_d
     float or None
         Trend score (0-100), or None if data unavailable
     """
-    target_date = pd.to_datetime(target_date_str)
-    pytrends = TrendReq(hl='en-US', tz=360)
-
     delay = initial_delay
     # generate random VPN password and port
     password = secrets.token_urlsafe(16)
@@ -58,6 +52,11 @@ def get_google_trend(title, target_date_str, window=30, max_retries=5, initial_d
         stderr=subprocess.PIPE,
         text=True
     )
+
+    target_date = pd.to_datetime(target_date_str)
+    pytrends = TrendReq(hl='en-US', tz=360)
+
+    delay = initial_delay
 
     for attempt in range(max_retries):
         try:
@@ -122,18 +121,18 @@ def get_google_trend(title, target_date_str, window=30, max_retries=5, initial_d
             return None
 
     print(f"Failed to fetch trend for {title} after {max_retries} retries.")
+    vpn_process.terminate()
     return None
+
 
 
 # -----------------------------
 # Example usage
 # -----------------------------
 if __name__ == "__main__":
-    for i in range(1,100):
-        title = "Children of Men"
-        date_str = "2025-9-7"
-        time.sleep(30)
-        trend_score = get_google_trend(title, date_str,initial_delay=1,window=180)
+    title = "Schindler's List"
+    date_str = "2025-09-07"
+    # time.sleep(30)
+    trend_score = get_google_trend(title, date_str,initial_delay=60,window=180,max_retries=10)
 
-        print(f"Google Trend score for '{title}' on {date_str}: {trend_score}")
-
+    print(f"Google Trend score for '{title}' on {date_str}: {trend_score}")
