@@ -907,7 +907,7 @@ def main():
 
     # Start pvpn with UDP (or change to --tcp if needed)
     vpn_process = subprocess.Popen(
-        ["pvpn", "-p", password, "--udp"],
+        ["pvpn", "-p", password],
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
         text=True
