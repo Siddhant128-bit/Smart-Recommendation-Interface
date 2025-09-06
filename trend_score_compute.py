@@ -14,7 +14,7 @@ from datetime import datetime, timedelta
 from pytrends.request import TrendReq
 from pytrends.exceptions import TooManyRequestsError
 from prophet import Prophet
-import subprocess, secrets, random
+
 
 
 
@@ -43,18 +43,6 @@ def get_google_trend(title, target_date_str, window=30, max_retries=5, initial_d
     float or None
         Trend score (0-100), or None if data unavailable
     """
-    # generate random VPN password and port
-    password = secrets.token_urlsafe(16)
-    port = random.randint(10000, 60000)
-
-    print(f"Starting VPN on port {port} with password {password}")
-
-    vpn_process = subprocess.Popen(
-        ["pvpn", "-p", password, "--udp", "--port", str(port)],
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
-        text=True
-    )
     target_date = pd.to_datetime(target_date_str)
     pytrends = TrendReq(hl='en-US', tz=360)
 
