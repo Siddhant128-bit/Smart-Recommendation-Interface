@@ -116,6 +116,14 @@ def get_google_trend(title, target_date_str, window=30, max_retries=5, initial_d
             print(f"Rate limited by Google. Waiting {delay} seconds (attempt {attempt+1}/{max_retries})...")
             time.sleep(delay)
             delay *= 1.5  # backoff
+            port = random.randint(10000, 60000)
+            vpn_process = subprocess.Popen(
+               ["pvpn", "-p", password, "--udp", "--port", str(port)],
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                text=True
+            )
+            print(f"Starting VPN on port {port} with password {password}")
         except Exception as e:
             print(f"Error fetching trend for {title}: {e}")
             return None

@@ -632,7 +632,8 @@ def secondary_page():
                                 "release date": row["Upload_Date"],
                                 "hype score": row["Hype_Score"],
                                 "minimum_view": row["Min"],
-                                "max": row["Max"],
+                                "avg_view": row['Avg'],
+                                "max": row["Max"]
                             }
                         else:
                             results = mt.model_inference(
@@ -646,6 +647,7 @@ def secondary_page():
                                 results["release date"],
                                 results["hype score"],
                                 results["minimum_view"],
+                                results['avg_view'],
                                 results["max"],
                             )
 
@@ -701,9 +703,10 @@ def secondary_page():
                             unsafe_allow_html=True
                         )
 
-                        col1, col2 = st.columns(2)
+                        col1, col2, col3  = st.columns(3)
                         col1.metric("Min Views", results["minimum_view"])
-                        col2.metric("Max Views", results["max"])
+                        col2.metric("Avg Views", results["avg_view"])
+                        col3.metric("Max View", results["max"])
 
                     except Exception as e:
                         st.error(f"Inference failed: {e}")

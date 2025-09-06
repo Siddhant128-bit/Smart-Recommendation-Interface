@@ -24,19 +24,20 @@ class cache_memory:
         self.user_name=user_name
     
     def create_cache(self):
-        df=pd.DataFrame(columns=['Title','Upload_Date','Hype_Score','Min','Max'])
+        df=pd.DataFrame(columns=['Title','Upload_Date','Hype_Score','Min','Avg','Max'])
         df.to_csv(f'User/{self.user_name}/{self.user_name}_cache.csv',index=False)
 
     def load_cache(self):
         df=pd.read_csv(f'User/{self.user_name}/{self.user_name}_cache.csv')
         self.loaded_dataframe=df
     
-    def dump_data(self,movie_name,date,trend_score,min_view,max_view):
+    def dump_data(self,movie_name,date,trend_score,min_view,avg_view,max_view):
         df = pd.DataFrame({
             'Title': [movie_name],
             'Upload_Date': [date],
             'Hype_Score': [trend_score],
             'Min': [min_view],
+            'Avg':[avg_view],
             'Max': [max_view]
         })
 

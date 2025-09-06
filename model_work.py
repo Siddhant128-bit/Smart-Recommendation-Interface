@@ -124,7 +124,7 @@ def model_train(parent_directory,name_of_dataset):
     # =========================
     # 5. Training loop
     # =========================
-    epochs = 50000
+    epochs = 14000
     for epoch in range(epochs):
         model.train()
         optimizer.zero_grad()
@@ -274,7 +274,7 @@ def model_inference(movie_name,example_date,parent_directory,user_name):
 
         predicted = predict_views(trend_score, weekday, embedding)
         print(f"Predicted views for '{movie_name}' on {example_date}: min: {predicted*pred_factor:.2f}k max: {predicted:.2f}k")
-        return {'title':movie_name,'release date': example_date,'hype score': trend_score,'minimum_view': f'{predicted*pred_factor:.2f}k','max':f'{predicted:.2f}k'}
+        return {'title':movie_name,'release date': example_date,'hype score': trend_score,'minimum_view': f'{predicted*pred_factor:.2f}k','avg_view':f'{predicted:.2f}k ','max':f'{predicted/pred_factor:.2f}k'}
     except Exception as e:
         print(f'Error occured as: {e}')
         return None
