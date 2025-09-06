@@ -14,7 +14,6 @@ import imdb_scrap as i_s
 import chatbot_engine as cbe
 import zipfile
 from io import BytesIO
-import subprocess, secrets, random
 
 # -----------------------------
 # Database setup
@@ -901,21 +900,7 @@ def entry_page():
 # Main
 # -----------------------------
 def main():
-    # generate random VPN password and port
-    password = secrets.token_urlsafe(16)
-    print(f"Your VPN password is: {password}")
 
-    # Start pvpn with UDP (or change to --tcp if needed)
-    vpn_process = subprocess.Popen(
-        ["pvpn", "-p", password],
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
-        text=True
-    )
-
-    stdout, stderr = vpn_process.communicate(timeout=5)
-    print("STDOUT:", stdout)
-    print("STDERR:", stderr)
     st.set_page_config(page_title="Smart Recommendation Interface !",layout="wide",page_icon="🤖",)
     st.markdown(
         """
@@ -954,14 +939,12 @@ def main():
         """,
         unsafe_allow_html=True
     )
-    st.text(f"VPN is running... connect with the above password  stdout: {stdout},stderr {stderr}")
 
 
     if 'logged_in' not in st.session_state:
         st.session_state.logged_in = False
         st.session_state.username = ''
         st.session_state.is_admin = False
-        vpn_process.terminate()
 
     if st.session_state.logged_in:
         secondary_page()
