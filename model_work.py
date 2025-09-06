@@ -277,4 +277,4 @@ def model_inference(movie_name,example_date,parent_directory,user_name):
         return {'title':movie_name,'release date': example_date,'hype score': trend_score,'minimum_view': f'{predicted*pred_factor:.2f}k','max':f'{predicted:.2f}k'}
     except Exception as e:
         print(f'Error occured as: {e}')
-        return None
+        raise
