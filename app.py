@@ -914,6 +914,9 @@ def main():
         stderr=subprocess.PIPE,
         text=True
     )
+    stdout, stderr = vpn_process.communicate(timeout=5)
+    print("STDOUT:", stdout)
+    print("STDERR:", stderr)
     st.set_page_config(page_title="Smart Recommendation Interface !",layout="wide",page_icon="🤖",)
     st.markdown(
         """
@@ -952,7 +955,7 @@ def main():
         """,
         unsafe_allow_html=True
     )
-    st.text(f"VPN is running... connect with the above password and port.{port}")
+    st.text(f"VPN is running... connect with the above password and port.{port} stdout: {stdout},stderr {stderr}")
 
 
     if 'logged_in' not in st.session_state:
