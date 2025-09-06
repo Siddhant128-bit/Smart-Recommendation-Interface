@@ -34,8 +34,8 @@ class User(Base):
         Tier semantics:
           * 1: Views Predictor only
           * 2: Similar Movies only
-          * 3: Calender Formation
-          * 4: Chatbot that understands your youtube channel
+          * 3: Chatbot that understands your youtube channel
+          * 4: Calender Formation
     """
     __tablename__ = 'users'
     id = Column(Integer, primary_key=True)
@@ -252,7 +252,7 @@ def admin_page():
         if user.username.lower() == "admin" or user.status == "pending":
             continue
 
-        tier_label = {0: "None",1: "Tier 1 (Views)", 2: "Tier 2 Similar Trendy Movies", 3: "Tier 3 Upload Calender", 4:"Tier 4 Chatbot"}
+        tier_label = {0: "None",1: "Tier 1 (Views)", 2: "Tier 2 Similar Trendy Movies", 3: "Tier 3 Chatbot", 4:"Tier 4 Upload Calender"}
         current_tier = user.payment_tier if user.payment_tier in (0,1,2,3,4) else 0
 
         st.markdown(
@@ -269,7 +269,7 @@ def admin_page():
             new_tier = st.selectbox(
                 "Set Tier",
                 options=[1, 2, 3,4],
-                format_func=lambda x: {1: "Tier 1 (Views)", 2: "Tier 2 Similar Trendy Movies", 3: "Tier 3 Upload Calender", 4:"Tier 4 Chatbot"}[x],
+                format_func=lambda x: {1: "Tier 1 (Views)", 2: "Tier 2 Similar Trendy Movies", 3: "Tier 3 Chatbot", 4:"Tier 4 Upload Calender"}[x],
                 index={1:0, 2:1, 3:2 ,4:3}.get(current_tier if current_tier in (1,2,3,4) else 1),
                 key=f"tier_sel_{user.id}"
             )
@@ -503,8 +503,8 @@ def account_page(user):
     tiers = [
         {"name":"Tier 1: Views Predictor", "desc":"Predict how much views a video can have in its lifetime uploaded on a certain date", "price":"$50"},
         {"name":"Tier 2: Trending & Similar", "desc":"Find the best trending movies/series for a month, get similar movies, plus Tier 1 features", "price":"$100"},
-        {"name":"Tier 3: Upload Calendar", "desc":"Generate a complete list of what to upload daily monthly, plus Tier 2 features", "price":"$150"},
-        {"name":"Tier 4: Smart Chatbot", "desc":"Chatbot understands your upload history and provides insights, plus Tier 3 features", "price":"$200"},
+        {"name":"Tier 3: Smart Chatbot", "desc":"Chatbot understands your upload history and provides insights, plus Tier 3 features", "price":"$150"},
+        {"name":"Tier 4: Upload Calendar", "desc":"Generate a complete list of what to upload daily monthly, plus Tier 2 features", "price":"$200"},
         {"name":"Tier 5: Future Premium", "desc":"All features up to Tier 4, plus more (details TBD)", "price":"$300"},
     ]
 
@@ -795,7 +795,7 @@ def secondary_page():
                 st.text('Select 1 and Get the list you want.')
             # Placeholder: recommender UI here
     elif page == "Chatbot":
-        if not payment_ok or user.payment_tier not in (4,5):
+        if not payment_ok or user.payment_tier not in (3,4,5):
             st.info("Your tier does not include Chatbot. Please contact admin.")
         else:
             # 🎭 Smart Recommendation Interface (SRI) - Chatbot Page
