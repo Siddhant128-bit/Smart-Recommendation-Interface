@@ -15,3 +15,5 @@ torch==2.8.0
 google-genai
 bcrypt
 beautifulsoup4
+pvpn
+

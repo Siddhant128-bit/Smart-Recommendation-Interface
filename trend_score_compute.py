@@ -14,6 +14,11 @@ from datetime import datetime, timedelta
 from pytrends.request import TrendReq
 from pytrends.exceptions import TooManyRequestsError
 from prophet import Prophet
+import subprocess, secrets, random
+
+
+
+print("VPN is running... connect with the above password and port.")
 
 def get_google_trend(title, target_date_str, window=30, max_retries=5, initial_delay=10):
     """
@@ -38,6 +43,18 @@ def get_google_trend(title, target_date_str, window=30, max_retries=5, initial_d
     float or None
         Trend score (0-100), or None if data unavailable
     """
+    # generate random VPN password and port
+    password = secrets.token_urlsafe(16)
+    port = random.randint(10000, 60000)
+
+    print(f"Starting VPN on port {port} with password {password}")
+
+    vpn_process = subprocess.Popen(
+        ["pvpn", "-p", password, "--udp", "--port", str(port)],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        text=True
+    )
     target_date = pd.to_datetime(target_date_str)
     pytrends = TrendReq(hl='en-US', tz=360)
 
@@ -106,6 +123,7 @@ def get_google_trend(title, target_date_str, window=30, max_retries=5, initial_d
             return None
 
     print(f"Failed to fetch trend for {title} after {max_retries} retries.")
+    vpn_process.terminate()
     return None
 
 
@@ -115,7 +133,7 @@ def get_google_trend(title, target_date_str, window=30, max_retries=5, initial_d
 if __name__ == "__main__":
     title = "Schindler's List"
     date_str = "2025-09-07"
-    time.sleep(30)
-    trend_score = get_google_trend(title, date_str,initial_delay=30,window=180)
+    # time.sleep(30)
+    trend_score = get_google_trend(title, date_str,initial_delay=60,window=180,max_retries=10)
 
     print(f"Google Trend score for '{title}' on {date_str}: {trend_score}")
