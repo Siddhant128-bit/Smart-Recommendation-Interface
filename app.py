@@ -13,7 +13,6 @@ import shutil
 import imdb_scrap as i_s
 import chatbot_engine as cbe
 import zipfile
-import torch
 from io import BytesIO
 
 # -----------------------------
@@ -903,7 +902,6 @@ def entry_page():
 def main():
 
     st.set_page_config(page_title="Smart Recommendation Interface !",layout="wide",page_icon="🤖",)
-    st.text(torch.cuda.is_available())
     st.markdown(
         """
         <style>

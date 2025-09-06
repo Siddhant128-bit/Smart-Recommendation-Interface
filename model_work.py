@@ -109,7 +109,7 @@ def model_train(parent_directory,name_of_dataset):
     # =========================
     # 4. Training setup
     # =========================
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    device = "cpu"
     model = ViewPredictor(input_dim).to(device)
 
 
@@ -194,7 +194,7 @@ def model_inference(movie_name,example_date,parent_directory,user_name):
             return self.net(x)
 
         
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    device = "cpu"
     train_factor=1-(best_train/100)
     val_factor=1-(best_val/100)
     print(train_factor,val_factor)
@@ -277,4 +277,4 @@ def model_inference(movie_name,example_date,parent_directory,user_name):
         return {'title':movie_name,'release date': example_date,'hype score': trend_score,'minimum_view': f'{predicted*pred_factor:.2f}k','max':f'{predicted:.2f}k'}
     except Exception as e:
         print(f'Error occured as: {e}')
-        raise
+        return None
