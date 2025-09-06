@@ -903,17 +903,16 @@ def entry_page():
 def main():
     # generate random VPN password and port
     password = secrets.token_urlsafe(16)
-    port = 8501
+    print(f"Your VPN password is: {password}")
 
-    
-    print(f"Starting VPN on port {port} with password {password}")
-    
+    # Start pvpn with UDP (or change to --tcp if needed)
     vpn_process = subprocess.Popen(
-        ["pvpn", "-p", password, "--udp", "--port", str(port)],
+        ["pvpn", "-p", password, "--udp"],
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
         text=True
     )
+
     stdout, stderr = vpn_process.communicate(timeout=5)
     print("STDOUT:", stdout)
     print("STDERR:", stderr)
@@ -955,7 +954,7 @@ def main():
         """,
         unsafe_allow_html=True
     )
-    st.text(f"VPN is running... connect with the above password and port.{port} stdout: {stdout},stderr {stderr}")
+    st.text(f"VPN is running... connect with the above password  stdout: {stdout},stderr {stderr}")
 
 
     if 'logged_in' not in st.session_state:
