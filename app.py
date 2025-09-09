@@ -14,6 +14,7 @@ import imdb_scrap as i_s
 import chatbot_engine as cbe
 import zipfile
 from io import BytesIO
+import metric_eval
 
 # -----------------------------
 # Database setup
@@ -503,9 +504,9 @@ def account_page(user):
     tiers = [
         {"name":"Tier 1: Views Predictor", "desc":"Predict how much views a video can have in its lifetime uploaded on a certain date", "price":"$50"},
         {"name":"Tier 2: Trending & Similar", "desc":"Find the best trending movies/series for a month, get similar movies, plus Tier 1 features", "price":"$100"},
-        {"name":"Tier 3: Smart Chatbot", "desc":"Chatbot understands your upload history and provides insights, plus Tier 2 features", "price":"$150"},
-        {"name":"Tier 4: Upload Calendar", "desc":"Generate a complete list of what to upload daily monthly, plus Tier 3 features", "price":"$200"},
-        {"name":"Tier 5: Future Premium", "desc":"All features up to Tier 4, plus more (details TBD)", "price":"$300"},
+        {"name":"Tier 3: Smart Chatbot & Accuracy Tracker", "desc":"Chatbot understands your upload history and provides insights, A place to evaulate how well the algorithm is doing plus Tier 2 features", "price":"$200"},
+        {"name":"Tier 4: Upload Calendar", "desc":"Generate a complete list of what to upload daily monthly, plus Tier 3 features", "price":"$300"},
+        {"name":"Tier 5: Future Premium", "desc":"All features up to Tier 4, plus more (details TBD)", "price":"$400"},
     ]
 
     st.markdown(f"<h2 style='text-align:center; color:{text_color};'>Available Tiers</h2>", unsafe_allow_html=True)
@@ -580,7 +581,7 @@ def secondary_page():
     # ---- Sidebar content ----
     with st.sidebar:
         st.title("🤖 SRI 🤖")
-        page = st.radio("Go to", ["Views Predictor", "Trending","Chatbot","Account Information"])
+        page = st.radio("Go to", ["Views Predictor", "Trending","Chatbot","Accuacy Tracker","Account Information"])
 
     # ---- Expiry / payment checks ----
     payment_ok = False
@@ -610,6 +611,8 @@ def secondary_page():
             else:
                 movie_series_name = st.text_input('Movie/Series Name')
                 date_of_release = st.text_input('Release Date (YYYY-MM-DD)').replace('/','-')
+                data_csv=st.file_uploader('Upload csv file from Google Trends:',type=['csv'])
+                data_csv = pd.read_csv(data_csv,skiprows=1) if data_csv is not None else None
                 try:
                     cache_obj = ut.cache_memory(st.session_state.username)
                     cache_obj.check_for_cache()
@@ -639,6 +642,7 @@ def secondary_page():
                             results = mt.model_inference(
                                 movie_series_name,
                                 date_of_release,
+                                data_csv,
                                 f"User/{user.username}",
                                 user.username,
                             )
@@ -875,6 +879,54 @@ def secondary_page():
                             """,
                             unsafe_allow_html=True
                         )
+    elif page =='Accuacy Tracker':
+        if not payment_ok or user.payment_tier not in (3,4,5):
+            st.info("Your tier does not include Algorithm Accuracy Tracker. Please contact admin.")
+        else:
+            st.title("🎯 Algorithm Accuracy Tracker")
+            col1, col2 = st.columns(2)
+            flag='Accuracy'
+            with col1:
+                if st.button("✅ Get Accuracy!"):
+                    with st.spinner("🔍 Calculating Accuracy, please wait..."):
+                        me = metric_eval.metric_eval(f'User/{st.session_state.username}/{st.session_state.username}_cache.csv')
+                        op = me.calculate_metrics(flag=flag)
+            with col2:
+                if st.button("🔬 Get Precision!"):
+                    flag='Precision'
+                    with st.spinner("🔍 Calculating Precision, please wait..."):
+                        me = metric_eval.metric_eval(f'User/{st.session_state.username}/{st.session_state.username}_cache.csv')
+                        op = me.calculate_metrics(flag=flag)
+
+            try:
+                # Extract values from op (adjust if your calculate_metrics returns differently)
+                accuracy = op['accuracy']
+                successful_movies = op["successful_movies"]
+                unsuccessful_movies = op["unsuccessful_movies"]
+
+                # Accuracy display
+                st.metric(label=f"✅ {flag}", value=f"{accuracy*100:.2f}%")
+
+                # Two-column layout
+                col1, col2 = st.columns(2)
+
+                with col1:
+                    st.subheader(f"💯 Correctly Predicted Movies")
+                    if successful_movies:
+                        st.success(f"Total: {len(successful_movies)}")
+                        st.write(pd.DataFrame(successful_movies, columns=["Movie"]))
+                    else:
+                        st.warning("No correct identifications yet!")
+
+                    with col2:
+                        st.subheader("⚠️ Wrongly Predicted Movies")
+                        if unsuccessful_movies:
+                            st.error(f"Total: {len(unsuccessful_movies)}")
+                            st.write(pd.DataFrame(unsuccessful_movies, columns=["Movie"]))
+                        else:
+                            st.info("No misclassifications!")
+            except Exception as e:
+                st.info("👆 Click the button above to calculate accuracy or Precision.")
 
 
     # ---- Logout ----

@@ -165,7 +165,7 @@ def model_train(parent_directory,name_of_dataset):
         json.dump(to_save_metadata, outfile, skipkeys=True)
 
 
-def model_inference(movie_name,example_date,parent_directory,user_name):
+def model_inference(movie_name,example_date,dataframe_ts,parent_directory,user_name):
     embedder = gms.embedder
     with open(f"{parent_directory}/{user_name}.json", "r") as f:
         to_save_metadata=json.load(f)
@@ -253,11 +253,12 @@ def model_inference(movie_name,example_date,parent_directory,user_name):
             
         # print(f'Embeddings observed: {embedding}')
 
-        time.sleep(45)
         print(f'target date: {example_date}')
         
-        trend_score = int(get_google_trend(movie_name, example_date, initial_delay=3,max_retries=12,window=180))
-        # trend_score=45.22
+
+        trend_score = int(get_google_trend(movie_name, example_date, dataframe_ts))
+        
+        # trend_score=40
 
         dt = datetime.strptime(example_date, "%Y-%m-%d")
         # Get weekday name
