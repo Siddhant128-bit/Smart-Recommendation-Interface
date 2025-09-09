@@ -3,6 +3,6 @@
 <p> 🚧 Under contruction 🛠️ </p>
 <p> Reference notes work to do: </p>
 <ul>
-  <li> Create a copy of cache.csv that should always be present for testing accuracy</li>
-  <li> A module to basically check how well the model is working </li>
+  <li>Need to create a large vector database for millions of movies.</li>
+  <li> Create Vector Database and return similar movies</li>
 </ul>
