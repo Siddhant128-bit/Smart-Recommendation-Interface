@@ -16,4 +16,4 @@ google-genai
 bcrypt
 beautifulsoup4
 pvpn
-
+selenium
