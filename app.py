@@ -889,13 +889,13 @@ def secondary_page():
             with col1:
                 if st.button("✅ Get Accuracy!"):
                     with st.spinner("🔍 Calculating Accuracy, please wait..."):
-                        me = metric_eval.metric_eval(f'User/{st.session_state.username}/{st.session_state.username}_cache.csv',"/usr/lib/chromium/chromedriver")
+                        me = metric_eval.calculate_metrics(f'User/{st.session_state.username}/{st.session_state.username}_cache.csv',"/usr/lib/chromium/chromedriver")
                         op = me.calculate_metrics(flag=flag)
             with col2:
                 if st.button("🔬 Get Precision!"):
                     flag='Precision'
                     with st.spinner("🔍 Calculating Precision, please wait..."):
-                        me = metric_eval.metric_eval(f'User/{st.session_state.username}/{st.session_state.username}_cache.csv',"/usr/lib/chromium/chromedriver")
+                        me = metric_eval.calculate_metrics(f'User/{st.session_state.username}/{st.session_state.username}_cache.csv',"/usr/lib/chromium/chromedriver")
                         op = me.calculate_metrics(flag=flag)
 
             try:
