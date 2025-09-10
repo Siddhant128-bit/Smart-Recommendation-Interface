@@ -1,3 +1,5 @@
+import subprocess
+import shutil
 import pandas as pd
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
@@ -6,17 +8,36 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.chrome.options import Options
 from bs4 import BeautifulSoup
+
+# --- Install Chromium & Chromedriver if not already installed ---
+subprocess.run("apt-get update", shell=True, check=False)
+subprocess.run("apt-get install -y chromium-browser chromium-chromedriver", shell=True, check=False)
+
+# Locate paths
+chrome_path = shutil.which("chromium-browser") or shutil.which("chromium")
+chromedriver_path = shutil.which("chromedriver")
+
+print(f"Using Chromium at: {chrome_path}")
+print(f"Using Chromedriver at: {chromedriver_path}")
+
+# --- Chrome options ---
 options = Options()
+options.binary_location = chrome_path
 options.add_argument("--headless=new")
 options.add_argument("--no-sandbox")
 options.add_argument("--disable-dev-shm-usage")
 
+service = Service(chromedriver_path)
+
 
 class metric_eval:
-    def __init__(self,data_url):
-        self.data_url=data_url
-    
-    def calculate_metrics(self,flag='Accuracy'):
+    def __init__(self, data_url):
+        self.data_url = data_url
+
+        # Start ONE Chrome session globally for all movies (faster)
+        self.driver = webdriver.Chrome(service=service, options=options)
+
+    def calculate_metrics(self, flag='Accuracy'):
         df = pd.read_csv(self.data_url)
         pred_movies = df['Title'].tolist()
 
@@ -28,16 +49,14 @@ class metric_eval:
             print(f"Started for movie {mov}")
             url = f"https://www.youtube.com/@VKunia/search?query={mov.replace(' ','%20')}"
 
-            
-            driver = webdriver.Chrome(options=options)
-            driver.get(url)
-
             try:
+                self.driver.get(url)
+
                 # wait until at least one video appears
-                WebDriverWait(driver, 5).until(
+                WebDriverWait(self.driver, 5).until(
                     EC.presence_of_element_located((By.TAG_NAME, "ytd-video-renderer"))
                 )
-                html = driver.page_source
+                html = self.driver.page_source
                 soup = BeautifulSoup(html, "html.parser")
 
                 videos = soup.find_all("ytd-video-renderer")
@@ -71,32 +90,39 @@ class metric_eval:
                             min_views_val = float(str(min_views).replace("k", "")) * 1000
                             max_views_val = float(str(max_views).replace("k", "")) * 1000
                             
-                            if flag=='Accuracy':
+                            if flag == 'Accuracy':
                                 if views_val >= min_views_val:
                                     successful_movies.append(mov)
                                     print(f"{mov} noted successfully -----")
                                 else:
                                     unsuccessful_movies.append(mov)
                                     print(f"{mov} noted not accurate -----")
-                            elif flag=='Precision':
-                                if views_val >= min_views_val and views_val<=max_views_val:
+                            elif flag == 'Precision':
+                                if views_val >= min_views_val and views_val <= max_views_val:
                                     successful_movies.append(mov)
                                     print(f"{mov} noted successfully -----")
                                 else:
                                     unsuccessful_movies.append(mov)
                                     print(f"{mov} noted not precise -----")
             except Exception as e:
-                print(f"Error processing {mov}")
-            finally:
-                driver.quit()   
+                print(f"Error processing {mov} -> {e}")
 
         # final results
         final_results['successful_movies'] = successful_movies
         final_results['unsuccessful_movies'] = unsuccessful_movies
-        final_results['accuracy'] = len(successful_movies) / max(1, (len(successful_movies)+len(unsuccessful_movies)))
+        final_results['accuracy'] = len(successful_movies) / max(1, (len(successful_movies) + len(unsuccessful_movies)))
 
         return final_results
 
-if __name__=='__main__':
-    me=metric_eval('User/vkunia/vkunia_cache.csv')
-    me.calculate_metrics()
+    def __del__(self):
+        # Cleanly close Chrome when the object is destroyed
+        try:
+            self.driver.quit()
+        except:
+            pass
+
+
+if __name__ == '__main__':
+    me = metric_eval('User/vkunia/vkunia_cache.csv')
+    results = me.calculate_metrics()
+    print("Final Results:", results)
