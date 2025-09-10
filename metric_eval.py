@@ -1,41 +1,28 @@
-import subprocess
-import shutil
 import pandas as pd
 from selenium import webdriver
-from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
+from selenium.webdriver.firefox.options import Options
+from selenium.webdriver.firefox.service import Service
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.chrome.options import Options
+from webdriver_manager.firefox import GeckoDriverManager
 from bs4 import BeautifulSoup
 
-# --- Install Chromium & Chromedriver if not already installed ---
-subprocess.run("apt-get update", shell=True, check=False)
-subprocess.run("apt-get install -y chromium-browser chromium-chromedriver", shell=True, check=False)
 
-# Locate paths
-chrome_path = shutil.which("chromium-browser") or shutil.which("chromium")
-chromedriver_path = shutil.which("chromedriver")
+firefoxOptions = Options()
+firefoxOptions.add_argument("--headless")
+firefoxOptions.add_argument("--no-sandbox")
+firefoxOptions.add_argument("--disable-dev-shm-usage")
 
-print(f"Using Chromium at: {chrome_path}")
-print(f"Using Chromedriver at: {chromedriver_path}")
-
-# --- Chrome options ---
-options = Options()
-options.binary_location = chrome_path
-options.add_argument("--headless=new")
-options.add_argument("--no-sandbox")
-options.add_argument("--disable-dev-shm-usage")
-
-service = Service(chromedriver_path)
+service = Service(GeckoDriverManager().install())
 
 
 class metric_eval:
     def __init__(self, data_url):
         self.data_url = data_url
-
-        # Start ONE Chrome session globally for all movies (faster)
-        self.driver = webdriver.Chrome(service=service, options=options)
+        # Initialize driver once
+        self.driver = webdriver.Firefox(options=firefoxOptions, service=service)
+        self.driver.implicitly_wait(2)  # short dynamic wait
 
     def calculate_metrics(self, flag='Accuracy'):
         df = pd.read_csv(self.data_url)
@@ -46,66 +33,77 @@ class metric_eval:
         final_results = {}
 
         for mov in pred_movies:
-            print(f"Started for movie {mov}")
-            url = f"https://www.youtube.com/@VKunia/search?query={mov.replace(' ','%20')}"
-
             try:
+                print(f"Started for movie {mov}")
+                url = f"https://www.youtube.com/@VKunia/search?query={mov.replace(' ','%20')}"
                 self.driver.get(url)
 
-                # wait until at least one video appears
-                WebDriverWait(self.driver, 5).until(
+                # wait up to 2s for a video to appear
+                WebDriverWait(self.driver, 2).until(
                     EC.presence_of_element_located((By.TAG_NAME, "ytd-video-renderer"))
                 )
-                html = self.driver.page_source
-                soup = BeautifulSoup(html, "html.parser")
 
+                soup = BeautifulSoup(self.driver.page_source, "html.parser")
                 videos = soup.find_all("ytd-video-renderer")
 
-                for v in videos[:2]:  # check first 2
+                found = False
+                for v in videos[:2]:
                     title_tag = v.find("a", id="video-title")
                     metadata = v.find("div", id="metadata-line")
+                    if not title_tag or not metadata:
+                        continue
 
-                    views = None
-                    if metadata:
-                        spans = metadata.find_all("span")
-                        if spans:
-                            views = spans[0].get_text(strip=True)  # e.g. "21K views"
+                    title = title_tag.get("title", "").lower()
+                    if "teaser" in title or "trailer" in title:
+                        continue
+                    if mov.lower() not in title:
+                        continue
 
-                    if title_tag and title_tag.has_attr("title"):
-                        if 'teaser' in title_tag['title'].lower() or 'trailer' in title_tag['title'].lower():
-                            continue
-                        elif mov.lower() in title_tag['title'].lower():
-                            # normalize views
-                            if "K" in views:
-                                views_val = float(views.replace("K views", "").strip()) * 1000
-                            elif "M" in views:
-                                views_val = float(views.replace("M views", "").strip()) * 1_000_000
-                            else:
-                                views_val = float(views.replace("views", "").strip().replace(",", ""))
+                    spans = metadata.find_all("span")
+                    if not spans:
+                        continue
+                    views = spans[0].get_text(strip=True)
 
-                            min_views = df.loc[df['Title'] == mov, 'Min'].values[0]
-                            max_views = df.loc[df['Title'] == mov, 'Max'].values[0]
+                    # normalize views
+                    if "K" in views:
+                        views_val = float(views.replace("K views", "").strip()) * 1000
+                    elif "M" in views:
+                        views_val = float(views.replace("M views", "").strip()) * 1_000_000
+                    else:
+                        views_val = float(views.replace("views", "").strip().replace(",", ""))
 
-                            # remove "k" if present
-                            min_views_val = float(str(min_views).replace("k", "")) * 1000
-                            max_views_val = float(str(max_views).replace("k", "")) * 1000
-                            
-                            if flag == 'Accuracy':
-                                if views_val >= min_views_val:
-                                    successful_movies.append(mov)
-                                    print(f"{mov} noted successfully -----")
-                                else:
-                                    unsuccessful_movies.append(mov)
-                                    print(f"{mov} noted not accurate -----")
-                            elif flag == 'Precision':
-                                if views_val >= min_views_val and views_val <= max_views_val:
-                                    successful_movies.append(mov)
-                                    print(f"{mov} noted successfully -----")
-                                else:
-                                    unsuccessful_movies.append(mov)
-                                    print(f"{mov} noted not precise -----")
+                    min_views = df.loc[df['Title'] == mov, 'Min'].values[0]
+                    max_views = df.loc[df['Title'] == mov, 'Max'].values[0]
+                    min_views_val = float(str(min_views).replace("k", "")) * 1000
+                    max_views_val = float(str(max_views).replace("k", "")) * 1000
+
+                    if flag == 'Accuracy':
+                        if views_val >= min_views_val:
+                            successful_movies.append(mov)
+                            print(f"{mov} ✓ Accurate")
+                        else:
+                            unsuccessful_movies.append(mov)
+                            print(f"{mov} ✗ Not Accurate")
+                    elif flag == 'Precision':
+                        if min_views_val <= views_val <= max_views_val:
+                            successful_movies.append(mov)
+                            print(f"{mov} ✓ Precise")
+                        else:
+                            unsuccessful_movies.append(mov)
+                            print(f"{mov} ✗ Not Precise")
+
+                    found = True
+                    break
+
+                if not found:
+                    unsuccessful_movies.append(mov)
+
             except Exception as e:
-                print(f"Error processing {mov} -> {e}")
+                print(f"Error processing {mov}: {e}")
+                unsuccessful_movies.append(mov)
+
+        # Quit driver once
+        self.driver.quit()
 
         # final results
         final_results['successful_movies'] = successful_movies
@@ -114,15 +112,7 @@ class metric_eval:
 
         return final_results
 
-    def __del__(self):
-        # Cleanly close Chrome when the object is destroyed
-        try:
-            self.driver.quit()
-        except:
-            pass
-
 
 if __name__ == '__main__':
     me = metric_eval('User/vkunia/vkunia_cache.csv')
-    results = me.calculate_metrics()
-    print("Final Results:", results)
+    print(me.calculate_metrics())
