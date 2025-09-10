@@ -7,7 +7,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.chrome.options import Options
 from bs4 import BeautifulSoup
 
-class MetricEval:
+class metric_eval:
     def __init__(self, data_url, executable_path=None):
         """
         Initialize with a CSV path and optional Selenium ChromeDriver service.
@@ -127,6 +127,6 @@ class MetricEval:
 
 if __name__ == '__main__':
     # For local testing
-    me = MetricEval('User/vkunia/vkunia_cache.csv')
+    me = metric_eval('User/vkunia/vkunia_cache.csv')
     results = me.calculate_metrics(flag='Precision')
     print(results)
