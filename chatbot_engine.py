@@ -137,6 +137,45 @@ def ask_gemini(user_message: str, history: list, username: str, user_data: pd.Da
     except Exception as e:
         return f"An error occurred: {e}"
 
+def ask_gemini_similarity(user_message: str) -> str:
+    """
+    Stateless Gemini call using a merged prompt (system + user).
+    Session ID is used only for structural compatibility.
+    """
+    system_prompt_similarity = """
+    You are going to help out in similarity search by providing relevant text snippets as following
+    Provided a movie/series name, You will return different main features as 
+    - Name of the movie
+    - Summary of the movie within 2-3 sentences.
+    - Genre of the movie upto 5 genres
+    - Main actors in the movie upto 5 actors
+    - Director of the movie
+    - Release year of the movie
+    - Production Company of the movie
+    Don't give me key name just return values I don't want it as -Name of the movie: Inception I just want -Inception
+    """
+    try:
+        
+        full_prompt = system_prompt_similarity.strip() + "\n\nUser query: " + user_message.strip()
+
+        response = client.models.generate_content(
+            model="gemini-2.5-flash",
+            contents=[{"parts": [{"text": full_prompt}]}],
+            config=types.GenerateContentConfig(
+                thinking_config=types.ThinkingConfig(thinking_budget=0),
+                max_output_tokens=2000
+            )
+        )
+
+        if response.candidates and response.candidates[0].content and response.candidates[0].content.parts:
+            # print(f"Response: {response.candidates[0].content.parts[0].text}")
+            return "".join(part.text for part in response.candidates[0].content.parts if part.text)
+        else:
+            return "No response generated."
+
+    except Exception as e:
+        return f"An error occurred: {e}"
+
 
 if __name__ == '__main__':
     username = 'vkunia'

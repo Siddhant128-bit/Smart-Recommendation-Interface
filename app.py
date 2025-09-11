@@ -15,6 +15,7 @@ import chatbot_engine as cbe
 import zipfile
 from io import BytesIO
 import metric_eval
+import similarity_search as ss
 
 # -----------------------------
 # Database setup
@@ -804,9 +805,29 @@ def secondary_page():
         else:
             st.set_page_config(page_title="🔍Similar Movie Finder", layout="wide")
             st.title("🔍 Similar Movie Finder")
-            st.text_area('Enter Movie Name to get Similar Movies',value='The Matrix')
+            movie_name=st.text_area('Enter Movie Name to get Similar Movies',value='The Matrix')
+            numb_of_movies=st.selectbox('How many similar movies do you want?',options=[5,10,15,20],index=0,key='num_similar_movies')
             if st.button('Get Similar Movies!'):
-                st.info('Similar Movies Feature available soon !')
+                with st.spinner("🔍 Getting Similar Movies, please wait..."):
+                    op=ss.recommend(movie_name,top_n=numb_of_movies)
+                if op:
+                    
+                    # Convert to DataFrame for nicer display
+                    df = pd.DataFrame(op, columns=["Movie Name", "Similarity Score"])
+                    df["Similarity Score"] = (df["Similarity Score"] * 100).round(2).astype(str) + " %"
+                    
+                    # Optionally, display as metrics cards
+                    st.markdown("### ⭐ Top Picks")
+                    for movie, score in op:
+                        col1, col2 = st.columns([3, 1])
+                        with col1:
+                            st.write(f"#### {movie} ####")
+                        with col2:
+                            # Convert distance to similarity
+                            similarity = max(0, (1 / (1 + score)) * 100)  # smaller distance → higher similarity
+                            st.metric(label="Similarity", value=f"{similarity:.2f}%")
+                
+
 
     elif page == "Chatbot":
         if not payment_ok or user.payment_tier not in (3,4,5):
