@@ -17,3 +17,4 @@ bcrypt
 beautifulsoup4
 pvpn
 selenium
+faiss-cpu
