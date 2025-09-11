@@ -581,7 +581,7 @@ def secondary_page():
     # ---- Sidebar content ----
     with st.sidebar:
         st.title("🤖 SRI 🤖")
-        page = st.radio("Go to", ["Views Predictor", "Trending","Chatbot","Accuacy Tracker","Account Information"])
+        page = st.radio("Go to", ["Views Predictor", "Trending Movies","Similar Movies","Chatbot","Accuacy Tracker","Account Information"])
 
     # ---- Expiry / payment checks ----
     payment_ok = False
@@ -597,7 +597,7 @@ def secondary_page():
 
     # Gate by tier
     if page == "Views Predictor":
-        if not payment_ok or user.payment_tier not in (1, 2, 3,4):
+        if not payment_ok or user.payment_tier not in (1, 2, 3,4,5):
             st.info("Your tier does not include Views Predictor. Please contact admin.")
         else:
             st.subheader("Views Predictor")
@@ -743,8 +743,8 @@ def secondary_page():
                         st.experimental_rerun()  # go back to main navigation page
                         st.rerun()
 
-    elif page == "Trending":
-        if not payment_ok or user.payment_tier not in (2,3,4):
+    elif page == "Trending Movies":
+        if not payment_ok or user.payment_tier not in (2,3,4,5):
             st.info("Your tier does not include Trending & Similar Movies Recommender. Please contact admin.")
         else:
             st.set_page_config(page_title="Trendy Movie Explorer", layout="wide")
@@ -798,6 +798,16 @@ def secondary_page():
             else: 
                 st.text('Select 1 and Get the list you want.')
             # Placeholder: recommender UI here
+    elif page=='Similar Movies':
+        if not payment_ok or user.payment_tier not in (2,3,4,5):
+            st.info("Your tier does not include Trending & Similar Movies Recommender. Please contact admin.")
+        else:
+            st.set_page_config(page_title="🔍Similar Movie Finder", layout="wide")
+            st.title("🔍 Similar Movie Finder")
+            st.text_area('Enter Movie Name to get Similar Movies',value='The Matrix')
+            if st.button('Get Similar Movies!'):
+                st.info('Similar Movies Feature available soon !')
+
     elif page == "Chatbot":
         if not payment_ok or user.payment_tier not in (3,4,5):
             st.info("Your tier does not include Chatbot. Please contact admin.")
@@ -889,13 +899,13 @@ def secondary_page():
             with col1:
                 if st.button("✅ Get Accuracy!"):
                     with st.spinner("🔍 Calculating Accuracy, please wait..."):
-                        me = metric_eval.metric_eval(f'User/{st.session_state.username}/{st.session_state.username}_cache.csv',"/usr/bin/chromedriver")
+                        me = metric_eval.metric_eval(f'User/{st.session_state.username}/{st.session_state.username}_cache.csv')
                         op = me.calculate_metrics(flag=flag)
             with col2:
                 if st.button("🔬 Get Precision!"):
                     flag='Precision'
                     with st.spinner("🔍 Calculating Precision, please wait..."):
-                        me = metric_eval.metric_eval(f'User/{st.session_state.username}/{st.session_state.username}_cache.csv',"/usr/bin/chromedriver")
+                        me = metric_eval.metric_eval(f'User/{st.session_state.username}/{st.session_state.username}_cache.csv')
                         op = me.calculate_metrics(flag=flag)
 
             try:
