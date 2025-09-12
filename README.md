@@ -3,7 +3,9 @@
 <p> 🚧 Under contruction 🛠️ </p>
 <p> Reference notes work to do: </p>
 <ul>
-  <li>Need to create a large vector database for millions of movies.</li>
-  <li> Create Vector Database and return similar movies (FIASS)</li>
-  <li> Standarize the description of the movies using gemini (Name of movie, Summary of movie,director name, cast name,production company)</li>
+  <li>Tier 4 feature </li>
+    <ul>
+      <li> Calender based prediction where each day for release of video can be seen, Along with trend score and suff</li>
+      <li> THe idea right now is use the trending movies list and from that run all of it with our prediction engine Rough draft might not work</li>
+    </ul>
 </ul>
