@@ -621,8 +621,8 @@ def secondary_page():
 
                 # Convert to desired format: YYYY-MM-DD
                 date_of_release = selected_date.strftime("%Y-%m-%d")
-                data_csv=st.file_uploader('Upload csv file from Google Trends:',type=['csv'])
-                data_csv = pd.read_csv(data_csv,skiprows=1) if data_csv is not None else None
+                # data_csv=st.file_uploader('Upload csv file from Google Trends:',type=['csv'])
+                data_csv = None
                 try:
                     cache_obj = ut.cache_memory(st.session_state.username)
                     cache_obj.check_for_cache()
