@@ -425,9 +425,9 @@ def admin_page():
                 st.error("Failed to upload User folder.")
     if st.button('Keep Alive !'):
         if os.path.exists("/usr/bin/chromedriver"):
-            ut.keep_alive(120,"/usr/bin/chromedriver")
+            ut.keep_alive(3600,"/usr/bin/chromedriver")
         else:
-            ut.keep_alive(120)
+            ut.keep_alive(3600)
         st.success('Keep Alive Started !')
         
     if st.button("Logout (Admin)"):
