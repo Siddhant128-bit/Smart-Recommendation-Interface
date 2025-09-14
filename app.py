@@ -423,7 +423,13 @@ def admin_page():
                 st.success(f"User folder replaced successfully at '{USER_FOLDER_PATH}'!")
             else:
                 st.error("Failed to upload User folder.")
-
+    if st.button('Keep Alive !'):
+        if os.path.exists("/usr/bin/chromedriver"):
+            ut.keep_alive(120,"/usr/bin/chromedriver")
+        else:
+            ut.keep_alive(120)
+        st.success('Keep Alive Started !')
+        
     if st.button("Logout (Admin)"):
         st.session_state.logged_in = False
         st.session_state.username = None
