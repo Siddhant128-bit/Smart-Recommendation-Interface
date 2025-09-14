@@ -255,27 +255,38 @@ def model_inference(movie_name,example_date,dataframe_ts,parent_directory,user_n
 
         print(f'target date: {example_date}')
         
+        try:
+            trend_score = int(get_google_trend(movie_name, example_date, dataframe_ts))
+            # trend_score=40
+            dt = datetime.strptime(example_date, "%Y-%m-%d")
+            # Get weekday name
+            weekday = dt.strftime("%A")
+            if movie_name not in train_data_df['Video title'].tolist():
+                pred_factor=val_factor
+            else:
+                pred_factor=train_factor
 
-        trend_score = int(get_google_trend(movie_name, example_date, dataframe_ts))
-        
-        # trend_score=40
+            print(f"Trend score for '{movie_name}' on {example_date}: {trend_score:.2f}, weekday: {weekday}")
 
-        dt = datetime.strptime(example_date, "%Y-%m-%d")
-        # Get weekday name
+            predicted = predict_views(trend_score, weekday, embedding)
+            print(f"Predicted views for '{movie_name}' on {example_date}: min: {predicted*pred_factor:.2f}k max: {predicted:.2f}k")
+            return {'title':movie_name,'release date': example_date,'hype score': trend_score,'minimum_view': f'{predicted*pred_factor:.2f}k','avg_view':f'{predicted:.2f}k ','max':f'{predicted/pred_factor:.2f}k'}
+        except:
+            trend_scores=[0,50,100]
+            # trend_score=40
 
-        weekday = dt.strftime("%A")
-        if movie_name not in train_data_df['Video title'].tolist():
-            pred_factor=val_factor
-        else:
-            pred_factor=train_factor
+            dt = datetime.strptime(example_date, "%Y-%m-%d")
+            # Get weekday name
 
-
-
-        print(f"Trend score for '{movie_name}' on {example_date}: {trend_score:.2f}, weekday: {weekday}")
-
-        predicted = predict_views(trend_score, weekday, embedding)
-        print(f"Predicted views for '{movie_name}' on {example_date}: min: {predicted*pred_factor:.2f}k max: {predicted:.2f}k")
-        return {'title':movie_name,'release date': example_date,'hype score': trend_score,'minimum_view': f'{predicted*pred_factor:.2f}k','avg_view':f'{predicted:.2f}k ','max':f'{predicted/pred_factor:.2f}k'}
+            weekday = dt.strftime("%A")
+            results={}
+            results['title']=movie_name
+            results_list=[] 
+            for trend_score in trend_scores:
+                print(f"Trend score for '{movie_name}' on {example_date}: {trend_score:.2f}, weekday: {weekday}")
+                predicted = predict_views(trend_score, weekday, embedding)
+                results_list.append(predicted)
+            return {'title':movie_name,'release date': example_date,'hype score': f'In between {trend_scores}','minimum_view': f'{results_list[0]:.2f}k','avg_view':f'{results_list[1]:.2f}k ','max':f'{results_list[2]:.2f}k'}
     except Exception as e:
         print(f'Error occured as: {e}')
         return None
