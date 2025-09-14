@@ -611,7 +611,10 @@ def secondary_page():
                     st.rerun()    
             else:
                 movie_series_name = st.text_input('Movie/Series Name')
-                date_of_release = st.text_input('Release Date (YYYY-MM-DD)').replace('/','-')
+                selected_date = st.date_input("Release Date")
+
+                # Convert to desired format: YYYY-MM-DD
+                date_of_release = selected_date.strftime("%Y-%m-%d")
                 data_csv=st.file_uploader('Upload csv file from Google Trends:',type=['csv'])
                 data_csv = pd.read_csv(data_csv,skiprows=1) if data_csv is not None else None
                 try:
@@ -920,13 +923,21 @@ def secondary_page():
             with col1:
                 if st.button("✅ Get Accuracy!"):
                     with st.spinner("🔍 Calculating Accuracy, please wait..."):
-                        me = metric_eval.metric_eval(f'User/{st.session_state.username}/{st.session_state.username}_cache.csv')
+                        if os.path.exists("/usr/bin/chromedriver"):
+                            me = metric_eval.metric_eval(f'User/{st.session_state.username}/{st.session_state.username}_cache.csv',"/usr/bin/chromedriver")
+                        else:
+                            me = metric_eval.metric_eval(f'User/{st.session_state.username}/{st.session_state.username}_cache.csv')
+
                         op = me.calculate_metrics(flag=flag)
             with col2:
                 if st.button("🔬 Get Precision!"):
                     flag='Precision'
                     with st.spinner("🔍 Calculating Precision, please wait..."):
-                        me = metric_eval.metric_eval(f'User/{st.session_state.username}/{st.session_state.username}_cache.csv')
+                        if os.path.exists("/usr/bin/chromedriver"):
+                            me = metric_eval.metric_eval(f'User/{st.session_state.username}/{st.session_state.username}_cache.csv',"/usr/bin/chromedriver")
+                        else:
+                            me = metric_eval.metric_eval(f'User/{st.session_state.username}/{st.session_state.username}_cache.csv')
+                            
                         op = me.calculate_metrics(flag=flag)
 
             try:
