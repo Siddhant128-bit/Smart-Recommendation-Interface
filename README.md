@@ -5,7 +5,8 @@
 <ul>
   <li>Tier 4 feature (Currently have no idea how to pursue this will get back to this later) </li>
     <ul>
-      <li> Calender based prediction where each day for release of video can be seen, Along with trend score and suff</li>
-      <li> THe idea right now is use the trending movies list and from that run all of it with our prediction engine Rough draft might not work</li>
+      <li> The new views predictor predicts on 3 range 0,50,100 so now i will use it to predict for each day of the month</li>
+      <li> Based on that we get which video to upload which day and how much views it can get.</li>
+      <li> This will automate everything and make it work !!</li>
     </ul>
 </ul>
