@@ -10,3 +10,4 @@
       <li> This will automate everything and make it work !!</li>
     </ul>
 </ul>
+<p> For Chatbot I have an idea i will create  eda from the user dataset dump it onto the json file with all key information and provide it as reference to chatbot</p>
