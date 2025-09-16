@@ -13,5 +13,7 @@
 <p> For Chatbot I have an idea i will create  eda from the user dataset dump it onto the json file with all key information and provide it as reference to chatbot</p>
 <p> For that we need following: </p>
 <ul>
-  
+  <li> EDA for user data with top performing genre top performing dates and worst performing week days </li>
+  <li> Use it as reference for the chatbot</li>
+  <li> Create a response classifier which identifies weather some specific instruction want another particular module to be called out or not if yes. Run it as well and add it as response on chatbot side.</li>
 </ul>
