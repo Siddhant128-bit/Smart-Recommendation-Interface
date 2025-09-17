@@ -845,9 +845,14 @@ def secondary_page():
             # 🎭 Smart Recommendation Interface (SRI) - Chatbot Page
 
             st.set_page_config(page_title="🤖 SRI Chatbot", layout="wide")
-            if st.button('Sync Chat'):
-                sc.sync_chatbot(st.session_state.username)
-                st.success('Chat Synced !')
+            if os.path.exists(f"User/{st.session_state.username}/{st.session_state.username}_chatbot_metadata.json")==False:
+                st.warning('Chatbot not synced Please Sync it !')
+                if st.button('Sync Chat'):
+                    sc.sync_chatbot(st.session_state.username)
+                    st.success('Chat Synced !')
+                    import time
+                    time.sleep(0.09)
+                    st.rerun()
             
             # Title & Subtitle
             st.markdown(
