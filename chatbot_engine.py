@@ -48,6 +48,7 @@ def initialize_chatbot(username):
 
     Be short, sweet, and personal with {username}. 
     Don't give long unrelated answers and don't hallucinate.
+    Keep the answer within 200 words and give only relevant answers.
     """
 
     # Load existing history if available
