@@ -70,9 +70,9 @@ def sync_chatbot(username,good_movie_view_count=1000000,average_movie_view_count
     meta_data_movies['Bad']=(data_test['Video title'].loc[data_test['Views'] >= bad_movie_view_count]).tolist()
 
 
-    print("📅 Metadata by Day:\n", meta_data_day, "\n")
-    print("🎭 Metadata by Genre:\n", meta_data_genre)
-    print("🎬 Metadata by Movies:\n", meta_data_movies)
+    # print("📅 Metadata by Day:\n", meta_data_day, "\n")
+    # print("🎭 Metadata by Genre:\n", meta_data_genre)
+    # print("🎬 Metadata by Movies:\n", meta_data_movies)
 
     final_results['By Day']=meta_data_day
     final_results['By Genre']=meta_data_genre
