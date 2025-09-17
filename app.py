@@ -16,7 +16,7 @@ import zipfile
 from io import BytesIO
 import metric_eval
 import similarity_search as ss
-
+import sync_chatbot as sc
 # -----------------------------
 # Database setup
 # -----------------------------
@@ -425,9 +425,9 @@ def admin_page():
                 st.error("Failed to upload User folder.")
     if st.button('Keep Alive !'):
         if os.path.exists("/usr/bin/chromedriver"):
-            ut.keep_alive(3600,"/usr/bin/chromedriver")
+            ut.keep_alive(120,"/usr/bin/chromedriver")
         else:
-            ut.keep_alive(3600)
+            ut.keep_alive(120)
         st.success('Keep Alive Started !')
         
     if st.button("Logout (Admin)"):
@@ -845,7 +845,10 @@ def secondary_page():
             # 🎭 Smart Recommendation Interface (SRI) - Chatbot Page
 
             st.set_page_config(page_title="🤖 SRI Chatbot", layout="wide")
-
+            if st.button('Sync Chat'):
+                sc.sync_chatbot(st.session_state.username)
+                st.success('Chat Synced !')
+            
             # Title & Subtitle
             st.markdown(
                 """
