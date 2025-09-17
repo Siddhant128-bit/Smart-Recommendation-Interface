@@ -14,7 +14,7 @@
 <p> For that we need following: </p>
 <ul>
   <li> <s> EDA for user data with top performing genre top performing dates and worst performing week days </s></li>
-  <li>create  eda from the user dataset dump it onto the json file with all key information </li>
+  <li>Eda from the user dataset dump it onto the json file with all key information </li>
   <li><s> Use it as reference for the chatbot </s></li>
   <li> Create a response classifier which identifies weather some specific instruction want another particular module to be called out or not if yes. Run it as well and add it as response on chatbot side.</li>
 </ul>
