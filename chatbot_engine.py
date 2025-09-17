@@ -80,6 +80,14 @@ def summarize_user_data(user_data: pd.DataFrame) -> dict:
     }
     return summary
 
+def get_chatbot_metadata(username):
+    meta_data_path=f'User/{username}/{username}_chatbot_metadata.json'
+    if os.path.exists(meta_data_path):
+        with open(meta_data_path,'r') as f:
+            metadata=json.load(f)
+            return metadata
+    else:
+        return 'No Metadata available'
 
 def ask_gemini(user_message: str, history: list, username: str, user_data: pd.DataFrame) -> str:
     """
@@ -112,8 +120,13 @@ def ask_gemini(user_message: str, history: list, username: str, user_data: pd.Da
             preview = filtered.head(10).to_dict(orient="records")
             relevant_context = f"\n\nRelevant video samples:\n{json.dumps(preview, indent=2)}"
 
-        # Inject into conversation
-        extra_context = f"\n\nHere is your channel summary:\n{summary_context}{relevant_context}"
+        chatbot_metadata=get_chatbot_metadata(username)
+        if chatbot_metadata!='No Metadata available':
+            print('Metadata found !')
+            extra_context =f"\n\nHere is some additional metadata about your channel:\n{summary_context}{relevant_context}{json.dumps(chatbot_metadata, indent=2)}"
+        else:
+            print("Metadata Not Found !")
+            extra_context = f"\n\nHere is your channel summary:\n{summary_context}{relevant_context}"
         history.append({"role": "user", "parts": [{"text": user_message + extra_context}]})
 
         # Call Gemini
