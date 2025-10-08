@@ -111,7 +111,7 @@ if __name__=='__main__':
     other_channels=[
         "https://www.youtube.com/@NatalieGoldReacts/videos",
         "https://www.youtube.com/@PopcornInBed/videos",
-        "https://www.youtube.com/@alexhefnerstvmovievault/videos"
+        # "https://www.youtube.com/@alexhefnerstvmovievault/videos"
     ]
     detail_df=pd.DataFrame(columns=['Title','Views','Subscribers'])
     title=[]
@@ -142,10 +142,10 @@ if __name__=='__main__':
     detail_df['Subscribers']=subscribers_l
     
 
-    # pd.set_option('display.max_columns', None)  # Show all columns
-    # pd.set_option('display.max_rows', None)     # Show all rows
-    # pd.set_option('display.max_colwidth', None) # Do not truncate column values
+    pd.set_option('display.max_columns', None)  # Show all columns
+    pd.set_option('display.max_rows', None)     # Show all rows
+    pd.set_option('display.max_colwidth', None) # Do not truncate column values
 
-    # elite_detail_df=detail_df.loc[detail_df['Views']/detail_df['Subscribers']>=0.85]
-    # elite_detail_df['est_views']=(elite_detail_df['Views']/elite_detail_df['Subscribers']*our_sub)/2
-    
+    elite_detail_df=detail_df.loc[detail_df['Views']/detail_df['Subscribers']>=0.85]
+    elite_detail_df['est_views']=(elite_detail_df['Views']/elite_detail_df['Subscribers']*our_sub)/2
+    print(elite_detail_df)
