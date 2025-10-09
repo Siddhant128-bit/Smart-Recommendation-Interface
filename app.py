@@ -17,6 +17,7 @@ from io import BytesIO
 import metric_eval
 import similarity_search as ss
 import sync_chatbot as sc
+import scrape_info as scraper
 # -----------------------------
 # Database setup
 # -----------------------------
@@ -835,9 +836,6 @@ def secondary_page():
                             # Convert distance to similarity
                             similarity = max(0, (1 / (1 + score)) * 100)  # smaller distance → higher similarity
                             st.metric(label="Similarity", value=f"{similarity:.2f}%")
-                
-
-
     elif page == "Chatbot":
         if not payment_ok or user.payment_tier not in (3,4,5):
             st.info("Your tier does not include Chatbot. Please contact admin.")
