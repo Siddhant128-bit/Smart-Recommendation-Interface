@@ -719,9 +719,9 @@ def secondary_page():
                         )
 
                         col1, col2, col3  = st.columns(3)
-                        col1.metric("Worst case views", results["minimum_view"])
-                        col2.metric("Average case views", results["avg_view"])
-                        col3.metric("Best case  view", results["max"])
+                        col1.metric("Worst case", results["minimum_view"])
+                        col2.metric("Average case", results["avg_view"])
+                        col3.metric("Best case", results["max"])
                         st.info('Worst case is when trend/hype score is 0 and Best case is when trend/hype score is 100')
 
                     except Exception as e:
