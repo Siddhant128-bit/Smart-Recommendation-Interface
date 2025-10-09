@@ -96,44 +96,45 @@ if __name__=='__main__':
     our_channel="https://www.youtube.com/@VKunia/videos"
     scroll_page(our_channel,channel='our_channel')
     our_sub=get_subscriber_count()
-    other_channels=[
-        "https://www.youtube.com/@NatalieGoldReacts/videos",
-        "https://www.youtube.com/@PopcornInBed/videos",
-        "https://www.youtube.com/@alexhefnerstvmovievault/videos"
-    ]
-    detail_df=pd.DataFrame(columns=['Title','Views','Subscribers'])
-    title=[]
-    views=[]
-    subscribers_l=[]
+    print(f'Sub Count: {our_sub}')
+    # other_channels=[
+    #     "https://www.youtube.com/@NatalieGoldReacts/videos",
+    #     "https://www.youtube.com/@PopcornInBed/videos",
+    #     "https://www.youtube.com/@alexhefnerstvmovievault/videos"
+    # ]
+    # detail_df=pd.DataFrame(columns=['Title','Views','Subscribers'])
+    # title=[]
+    # views=[]
+    # subscribers_l=[]
 
-    for video_url in other_channels:
-        print(video_url)
-        # Run the scrolling function to load videos
-        scroll_page(video_url=video_url)
+    # for video_url in other_channels:
+    #     print(video_url)
+    #     # Run the scrolling function to load videos
+    #     scroll_page(video_url=video_url)
 
-        # Extract video details
-        video_details = get_video_details()
+    #     # Extract video details
+    #     video_details = get_video_details()
 
-        # Extract the total subscribers
-        subscribers = get_subscriber_count()
+    #     # Extract the total subscribers
+    #     subscribers = get_subscriber_count()
 
-        print(video_details)
+    #     print(video_details)
 
-        # # Print out the extracted details
-        for detail in video_details:
-            title.append(detail['title'])
-            views.append(detail['views'])
-            subscribers_l.append(subscribers)
+    #     # # Print out the extracted details
+    #     for detail in video_details:
+    #         title.append(detail['title'])
+    #         views.append(detail['views'])
+    #         subscribers_l.append(subscribers)
 
-    detail_df['Title']=title
-    detail_df['Views']=views
-    detail_df['Subscribers']=subscribers_l
-    driver.quit()
+    # detail_df['Title']=title
+    # detail_df['Views']=views
+    # detail_df['Subscribers']=subscribers_l
+    # driver.quit()
 
-    pd.set_option('display.max_columns', None)  # Show all columns
-    pd.set_option('display.max_rows', None)     # Show all rows
-    pd.set_option('display.max_colwidth', None) # Do not truncate column values
+    # pd.set_option('display.max_columns', None)  # Show all columns
+    # pd.set_option('display.max_rows', None)     # Show all rows
+    # pd.set_option('display.max_colwidth', None) # Do not truncate column values
 
-    elite_detail_df=detail_df.loc[detail_df['Views']/detail_df['Subscribers']>=0.85]
-    elite_detail_df['est_views']=(elite_detail_df['Views']/elite_detail_df['Subscribers']*our_sub)/2
+    # elite_detail_df=detail_df.loc[detail_df['Views']/detail_df['Subscribers']>=0.85]
+    # elite_detail_df['est_views']=(elite_detail_df['Views']/elite_detail_df['Subscribers']*our_sub)/2
     
