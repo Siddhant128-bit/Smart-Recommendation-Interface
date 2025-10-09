@@ -128,5 +128,12 @@ if __name__=='__main__':
     detail_df['Title']=title
     detail_df['Views']=views
     detail_df['Subscribers']=subscribers_l
-
     driver.quit()
+
+    pd.set_option('display.max_columns', None)  # Show all columns
+    pd.set_option('display.max_rows', None)     # Show all rows
+    pd.set_option('display.max_colwidth', None) # Do not truncate column values
+
+    elite_detail_df=detail_df.loc[detail_df['Views']/detail_df['Subscribers']>=0.85]
+    elite_detail_df['est_views']=(elite_detail_df['Views']/elite_detail_df['Subscribers']*our_sub)/2
+    
