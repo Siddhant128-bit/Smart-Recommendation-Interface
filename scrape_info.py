@@ -81,7 +81,7 @@ def scroll_page(video_url="https://www.youtube.com/@VKunia/videos",channel='othe
 def get_subscriber_count():
     soup = BeautifulSoup(driver.page_source, 'html.parser')
     # Find the element that contains the subscriber count
-    subscriber_data = soup.find('div', class_='page-header-view-model-wiz__page-header-headline-info')
+    subscriber_data = soup.find('div', class_='yt-page-header-view-model__page-header-headline-info')
     print(subscriber_data)
     if subscriber_data:
         subscriber_text = subscriber_data.get_text(strip=True)
