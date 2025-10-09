@@ -108,39 +108,39 @@ if __name__=='__main__':
     # scroll_page(our_channel,channel='our_channel')
     # our_sub=get_subscriber_count()
     # print(f'Sub Count: {our_sub}')
-    # other_channels=[
-    #     "https://www.youtube.com/@NatalieGoldReacts/videos",
-    #     "https://www.youtube.com/@PopcornInBed/videos",
-    #     "https://www.youtube.com/@alexhefnerstvmovievault/videos"
-    # ]
-    # detail_df=pd.DataFrame(columns=['Title','Views','Subscribers'])
-    # title=[]
-    # views=[]
-    # subscribers_l=[]
+    other_channels=[
+        "https://www.youtube.com/@NatalieGoldReacts/videos",
+        "https://www.youtube.com/@PopcornInBed/videos",
+        "https://www.youtube.com/@alexhefnerstvmovievault/videos"
+    ]
+    detail_df=pd.DataFrame(columns=['Title','Views','Subscribers'])
+    title=[]
+    views=[]
+    subscribers_l=[]
 
-    # for video_url in other_channels:
-    #     print(video_url)
-    #     # Run the scrolling function to load videos
-    #     scroll_page(video_url=video_url)
+    for video_url in other_channels:
+        print(video_url)
+        # Run the scrolling function to load videos
+        WS.scroll_page(video_url=video_url)
 
-    #     # Extract video details
-    #     video_details = get_video_details()
+        # Extract video details
+        video_details = WS.get_video_details()
 
-    #     # Extract the total subscribers
-    #     subscribers = get_subscriber_count()
+        # Extract the total subscribers
+        subscribers = WS.get_subscriber_count()
 
-    #     print(video_details)
+        print(video_details)
 
-    #     # # Print out the extracted details
-    #     for detail in video_details:
-    #         title.append(detail['title'])
-    #         views.append(detail['views'])
-    #         subscribers_l.append(subscribers)
+        # # Print out the extracted details
+        for detail in video_details:
+            title.append(detail['title'])
+            views.append(detail['views'])
+            subscribers_l.append(subscribers)
 
-    # detail_df['Title']=title
-    # detail_df['Views']=views
-    # detail_df['Subscribers']=subscribers_l
-    # driver.quit()
+    detail_df['Title']=title
+    detail_df['Views']=views
+    detail_df['Subscribers']=subscribers_l
+    
 
     # pd.set_option('display.max_columns', None)  # Show all columns
     # pd.set_option('display.max_rows', None)     # Show all rows
