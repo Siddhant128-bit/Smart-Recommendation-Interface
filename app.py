@@ -719,9 +719,10 @@ def secondary_page():
                         )
 
                         col1, col2, col3  = st.columns(3)
-                        col1.metric("Min Views", results["minimum_view"])
-                        col2.metric("Avg Views", results["avg_view"])
-                        col3.metric("Max View", results["max"])
+                        col1.metric("Worst case views", results["minimum_view"])
+                        col2.metric("Average case views", results["avg_view"])
+                        col3.metric("Best case  view", results["max"])
+                        st.info('Worst case is when trend/hype score is 0 and Best case is when trend/hype score is 100')
 
                     except Exception as e:
                         st.error(f"Inference failed: {e}")
@@ -930,7 +931,7 @@ def secondary_page():
             st.info("Your tier does not include Collaborative Analysis. Please contact admin.")
         else: 
             st.title('Collaborative Analysis')
-            
+
     elif page =='Accuacy Tracker':
         if not payment_ok or user.payment_tier not in (3,4,5):
             st.info("Your tier does not include Algorithm Accuracy Tracker. Please contact admin.")
