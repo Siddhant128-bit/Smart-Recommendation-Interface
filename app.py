@@ -589,7 +589,7 @@ def secondary_page():
     # ---- Sidebar content ----
     with st.sidebar:
         st.title("🤖 SRI 🤖")
-        page = st.radio("Go to", ["Views Predictor", "Trending Movies","Similar Movies","Chatbot","Accuacy Tracker","Account Information"])
+        page = st.radio("Go to", ["Views Predictor", "Trending Movies","Similar Movies","Chatbot","Collaborative Analysis","Accuacy Tracker","Account Information"])
 
     # ---- Expiry / payment checks ----
     payment_ok = False
@@ -925,6 +925,12 @@ def secondary_page():
                             """,
                             unsafe_allow_html=True
                         )
+    elif page =='Collaborative Analysis':
+        if not payment_ok or user.payment_tier not in (4,5):
+            st.info("Your tier does not include Collaborative Analysis. Please contact admin.")
+        else: 
+            st.title('Collaborative Analysis')
+            
     elif page =='Accuacy Tracker':
         if not payment_ok or user.payment_tier not in (3,4,5):
             st.info("Your tier does not include Algorithm Accuracy Tracker. Please contact admin.")
