@@ -103,12 +103,13 @@ class webscrapper:
 class colaborative_userbase:
     def __init__(self,username):
         self.user_name=username
+        self.path_of_colaborative_json=f'User/{self.user_name}/colaborative_data.json'
     
     def add_user(self,user_url):
         
-        path_of_colaborative_json=f'User/{self.user_name}/colaborative_data.json'
+        
         if os.path.exists(f'User/{self.user_name}/colaborative_data.json'):
-            with open(path_of_colaborative_json,'r') as f:
+            with open(self.path_of_colaborative_json,'r') as f:
                 colaborative_dict=json.load(f)
             print(colaborative_dict)
         else: 
@@ -116,11 +117,19 @@ class colaborative_userbase:
 
         colaborative_dict[user_url]=f"https://www.youtube.com/@{user_url}/videos"
         print(colaborative_dict)
-        with open(path_of_colaborative_json, 'w') as f:
+        with open(self.path_of_colaborative_json, 'w') as f:
             json.dump(colaborative_dict, f)
             
         print(f"Username {user_url} Added")
 
+    def fetch_user(self,user_url):
+        if os.path.exists(self.path_of_colaborative_json):
+            with open(self.path_of_colaborative_json,'r') as f:
+                colaborative_dict=json.load(f)
+            return colaborative_dict[user_url]
+        else: 
+            return None
+        
 
 if __name__=='__main__':
     """
@@ -176,6 +185,6 @@ if __name__=='__main__':
     print(elite_detail_df)
     """
     colborative_obj=colaborative_userbase('vkunia')
-    # colborative_obj.add_user('NatalieGoldReacts')
+    colborative_obj.add_user('NatalieGoldReacts')
     colborative_obj.add_user('PopcornInBed')
-    
+    print(colborative_obj.fetch_user('NatalieGoldReacts'))
