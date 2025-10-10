@@ -175,5 +175,7 @@ if __name__=='__main__':
     elite_detail_df['est_views']=(elite_detail_df['Views']/elite_detail_df['Subscribers']*our_sub)/2
     print(elite_detail_df)
     """
-    colborative_obj=colaborative_userbase('Vkunia')
-    colborative_obj.add_user('Hey')
+    colborative_obj=colaborative_userbase('vkunia')
+    # colborative_obj.add_user('NatalieGoldReacts')
+    colborative_obj.add_user('PopcornInBed')
+    
