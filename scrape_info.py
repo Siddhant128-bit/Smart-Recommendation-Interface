@@ -71,12 +71,12 @@ class webscrapper:
     def scroll_page(self,video_url="https://www.youtube.com/@VKunia/videos",channel='other_channel'):
         self.driver.get(video_url)
         if channel=='other_channel':
-            time.sleep(1.5)  # Allow the page to load
+            time.sleep(1.15)  # Allow the page to load
             last_height = self.driver.execute_script("return document.documentElement.scrollHeight")
             
             while True:
                 self.driver.execute_script("window.scrollTo(0, document.documentElement.scrollHeight);")
-                time.sleep(1.5)  # Allow more videos to load
+                time.sleep(1.15)  # Allow more videos to load
                 new_height = self.driver.execute_script("return document.documentElement.scrollHeight")
                 if new_height == last_height:
                     break
@@ -129,10 +129,15 @@ class colaborative_userbase:
             return colaborative_dict[user_url]
         else: 
             return None
+    
+    def get_all_users(self):
+        with open(self.path_of_colaborative_json,'r') as f:
+            colaborative_dict=json.load(f)
+        return list(colaborative_dict.keys())
+    
         
 
 if __name__=='__main__':
-    """
     WS=webscrapper()
     our_channel="https://www.youtube.com/@VKunia/videos"
     WS.scroll_page(our_channel,channel='out_channel')
@@ -143,8 +148,8 @@ if __name__=='__main__':
     # our_sub=get_subscriber_count()
     # print(f'Sub Count: {our_sub}')
     other_channels=[
-        "https://www.youtube.com/@NatalieGoldReacts/videos",
-        "https://www.youtube.com/@PopcornInBed/videos",
+        "https://www.youtube.com/@HoldenHardman/videos",
+        # "https://www.youtube.com/@PopcornInBed/videos",
         # "https://www.youtube.com/@alexhefnerstvmovievault/videos"
     ]
     detail_df=pd.DataFrame(columns=['Title','Views','Subscribers'])
@@ -183,8 +188,7 @@ if __name__=='__main__':
     elite_detail_df=detail_df.loc[detail_df['Views']/detail_df['Subscribers']>=0.85]
     elite_detail_df['est_views']=(elite_detail_df['Views']/elite_detail_df['Subscribers']*our_sub)/2
     print(elite_detail_df)
-    """
-    colborative_obj=colaborative_userbase('vkunia')
-    colborative_obj.add_user('NatalieGoldReacts')
-    colborative_obj.add_user('PopcornInBed')
-    print(colborative_obj.fetch_user('NatalieGoldReacts'))
+    # colborative_obj=colaborative_userbase('vkunia')
+    # colborative_obj.add_user('NatalieGoldReacts')
+    # colborative_obj.add_user('PopcornInBed')
+    # print(colborative_obj.get_all_users())
