@@ -4,6 +4,8 @@ from selenium.webdriver.chrome.options import Options
 from bs4 import BeautifulSoup
 import time
 import pandas as pd
+import os
+import json
 
 class webscrapper:
     def __init__(self,Driver_path=None):
@@ -98,7 +100,30 @@ class webscrapper:
         return None
 
 
+class colaborative_userbase:
+    def __init__(self,username):
+        self.user_name=username
+    
+    def add_user(self,user_url):
+        
+        path_of_colaborative_json=f'User/{self.user_name}/colaborative_data.json'
+        if os.path.exists(f'User/{self.user_name}/colaborative_data.json'):
+            with open(path_of_colaborative_json,'r') as f:
+                colaborative_dict=json.load(f)
+            print(colaborative_dict)
+        else: 
+            colaborative_dict={}
+
+        colaborative_dict[user_url]=f"https://www.youtube.com/@{user_url}/videos"
+        print(colaborative_dict)
+        with open(path_of_colaborative_json, 'w') as f:
+            json.dump(colaborative_dict, f)
+            
+        print(f"Username {user_url} Added")
+
+
 if __name__=='__main__':
+    """
     WS=webscrapper()
     our_channel="https://www.youtube.com/@VKunia/videos"
     WS.scroll_page(our_channel,channel='out_channel')
@@ -149,3 +174,6 @@ if __name__=='__main__':
     elite_detail_df=detail_df.loc[detail_df['Views']/detail_df['Subscribers']>=0.85]
     elite_detail_df['est_views']=(elite_detail_df['Views']/elite_detail_df['Subscribers']*our_sub)/2
     print(elite_detail_df)
+    """
+    colborative_obj=colaborative_userbase('Vkunia')
+    colborative_obj.add_user('Hey')
