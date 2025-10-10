@@ -129,6 +129,12 @@ class colaborative_userbase:
             return colaborative_dict[user_url]
         else: 
             return None
+    
+    def get_all_users(self):
+        with open(self.path_of_colaborative_json,'r') as f:
+            colaborative_dict=json.load(f)
+        return list(colaborative_dict.keys())
+    
         
 
 if __name__=='__main__':
@@ -187,4 +193,4 @@ if __name__=='__main__':
     colborative_obj=colaborative_userbase('vkunia')
     colborative_obj.add_user('NatalieGoldReacts')
     colborative_obj.add_user('PopcornInBed')
-    print(colborative_obj.fetch_user('NatalieGoldReacts'))
+    print(colborative_obj.get_all_users())

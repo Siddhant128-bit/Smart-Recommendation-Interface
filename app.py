@@ -931,6 +931,18 @@ def secondary_page():
             st.info("Your tier does not include Collaborative Analysis. Please contact admin.")
         else: 
             st.title('Collaborative Analysis')
+            col1,col2=st.columns(2)
+            if os.path.exists(f'User/{st.session_state.username}/colaborative_data.json'):
+                with col1:
+                    if st.button('Add User'):
+                        st.text('Add User')
+                with col2:
+                    if st.button('Fetch User'):
+                        st.text(scraper.colaborative_userbase(st.session_state.username).get_all_users())
+            else:
+                with col1:
+                    if st.button('Add User'):
+                        st.text("Add User here !!")
 
     elif page =='Accuacy Tracker':
         if not payment_ok or user.payment_tier not in (3,4,5):
