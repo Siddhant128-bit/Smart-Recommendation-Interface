@@ -71,12 +71,12 @@ class webscrapper:
     def scroll_page(self,video_url="https://www.youtube.com/@VKunia/videos",channel='other_channel'):
         self.driver.get(video_url)
         if channel=='other_channel':
-            time.sleep(1.5)  # Allow the page to load
+            time.sleep(1.15)  # Allow the page to load
             last_height = self.driver.execute_script("return document.documentElement.scrollHeight")
             
             while True:
                 self.driver.execute_script("window.scrollTo(0, document.documentElement.scrollHeight);")
-                time.sleep(1.5)  # Allow more videos to load
+                time.sleep(1.15)  # Allow more videos to load
                 new_height = self.driver.execute_script("return document.documentElement.scrollHeight")
                 if new_height == last_height:
                     break

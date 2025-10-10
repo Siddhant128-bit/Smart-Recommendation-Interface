@@ -927,18 +927,73 @@ def secondary_page():
                             unsafe_allow_html=True
                         )
     elif page =='Collaborative Analysis':
+        if 'detail_df' not in st.session_state:
+            st.session_state.detail_df = pd.DataFrame(columns=['Title', 'Views', 'Subscribers'])
+
+
         if not payment_ok or user.payment_tier not in (4,5):
             st.info("Your tier does not include Collaborative Analysis. Please contact admin.")
-        else: 
+
+        else:
             st.title('Collaborative Analysis')
-            col1,col2=st.columns(2)
+            col1, col2 = st.columns(2)
+            view_tier_score={
+                'High': [10,0.85],
+                'Mid': [0.85,0.45],
+                'Low': [0.45,0.10],
+            }
+            
+            # Display the DataFrame if it contains data from a previous run
+            if not st.session_state.detail_df.empty:
+                st.dataframe(st.session_state.detail_df) # <--- Display stored data first
+
             if os.path.exists(f'User/{st.session_state.username}/colaborative_data.json'):
                 with col1:
                     if st.button('Add User'):
                         st.text('Add User')
                 with col2:
-                    if st.button('Fetch User'):
-                        st.text(scraper.colaborative_userbase(st.session_state.username).get_all_users())
+                    # Use a unique key for the selectbox to ensure its value persists correctly
+                    scraper_obj=scraper.colaborative_userbase(st.session_state.username)
+                    user_name = st.selectbox('Select User: ', scraper_obj.get_all_users(), key='user_selector')
+                    view_tier=st.selectbox('View_Tier: ',['High','Mid','Low'])
+                    view_tier=view_tier_score[view_tier]
+
+                    user_url = scraper_obj.fetch_user(user_name)
+
+                    if st.button('Get Analytics'):
+                        with st.spinner(f"🔍 Analysing Channel {user_name}"):
+                            # --- Logic to fetch data (only runs on button press) ---
+                            scraper_obj_2 = scraper.webscrapper()
+                            scraper_obj_2.scroll_page(video_url=user_url)
+                            video_details = scraper_obj_2.get_video_details()
+                            subscribers = scraper_obj_2.get_subscriber_count()
+
+                            title, views, subscribers_l = [], [], []
+
+                            for detail in video_details:
+                                title.append(detail['title'])
+                                views.append(detail['views'])
+                                subscribers_l.append(subscribers)
+
+                            new_df = pd.DataFrame()
+                            new_df['Title'] = title
+                            new_df['Views'] = views
+                            new_df['Subscribers'] = subscribers_l
+                            pd.set_option('display.max_columns', None)  # Show all columns
+                            pd.set_option('display.max_rows', None)     # Show all rows
+                            pd.set_option('display.max_colwidth', None) # Do not truncate column values
+
+                            elite_detail_df = new_df.loc[
+                                (new_df['Views'] / new_df['Subscribers'] >= view_tier[1]) & 
+                                (new_df['Views'] / new_df['Subscribers'] <= view_tier[0])
+                            ]
+                            
+                            # --- FIX: Store the fetched DataFrame in session state ---
+                            st.session_state.detail_df = elite_detail_df.sort_values(by='Views', ascending=False)
+                            
+                            # Rerun the script to display the new data
+                            st.rerun()
+
             else:
                 with col1:
                     if st.button('Add User'):
