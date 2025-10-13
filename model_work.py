@@ -286,7 +286,7 @@ def model_inference(movie_name,example_date,dataframe_ts,parent_directory,user_n
                 print(f"Trend score for '{movie_name}' on {example_date}: {trend_score:.2f}, weekday: {weekday}")
                 predicted = predict_views(trend_score, weekday, embedding)
                 results_list.append(predicted)
-            return {'title':movie_name,'release date': example_date,'hype score': f'In between {trend_scores}','minimum_view': f'{results_list[0]*pred_factor:.2f}k','avg_view':f'{results_list[1]:.2f}k ','max':f'{results_list[2]/pred_factor:.2f}k'}
+            return {'title':movie_name,'release date': example_date,'hype score': f'In between {trend_scores}','minimum_view': f'{results_list[0]*pred_factor:.2f}k','avg_view':f'{results_list[1]:.2f}k ','max':f'{results_list[2]:.2f}k'}
 
     except Exception as e:
         print(f'Error occured as: {e}')
