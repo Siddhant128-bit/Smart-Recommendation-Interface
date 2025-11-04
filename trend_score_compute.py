@@ -14,7 +14,7 @@ from prophet import Prophet
 def get_google_trend(title,target_date_str, data_csv):
     target_date = pd.to_datetime(target_date_str)
 
-
+    data_csv = pd.read_csv(data_csv,skiprows=1)
     data = pd.DataFrame()
     data['ds'] = pd.to_datetime(data_csv.iloc[:, 0], errors='coerce', format='%Y-%m-%d')  # Day column
     data['y']  = data_csv.iloc[:, 1]  # Dynamic trend column (e.g., 'Troy: (Worldwide)')

@@ -622,8 +622,17 @@ def secondary_page():
 
                 # Convert to desired format: YYYY-MM-DD
                 date_of_release = selected_date.strftime("%Y-%m-%d")
-                # data_csv=st.file_uploader('Upload csv file from Google Trends:',type=['csv'])
-                data_csv = None
+
+                st.markdown(
+                    """
+                    <div style='margin-bottom:-15px'>
+                        <b style='color: orange;'>[Optional]</b> Upload CSV file from Google Trends:
+                    </div>
+                    """,
+                    unsafe_allow_html=True
+                )
+
+                data_csv = st.file_uploader("", type=['csv'])
                 try:
                     cache_obj = ut.cache_memory(st.session_state.username)
                     cache_obj.check_for_cache()
@@ -929,7 +938,7 @@ def secondary_page():
     elif page == 'Collaborative Analysis':
         st.session_state.detail_df = pd.DataFrame(columns=['Title', 'Views', 'Subscribers'])
 
-        if not payment_ok or user.payment_tier not in (4, 5):
+        if not payment_ok or user.payment_tier not in (3,4, 5):
             st.info("Your tier does not include Collaborative Analysis. Please contact admin.")
         else:
             st.title('Collaborative Analysis')

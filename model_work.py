@@ -271,7 +271,8 @@ def model_inference(movie_name,example_date,dataframe_ts,parent_directory,user_n
             predicted = predict_views(trend_score, weekday, embedding)
             print(f"Predicted views for '{movie_name}' on {example_date}: min: {predicted*pred_factor:.2f}k max: {predicted:.2f}k")
             return {'title':movie_name,'release date': example_date,'hype score': trend_score,'minimum_view': f'{predicted*pred_factor:.2f}k','avg_view':f'{predicted:.2f}k ','max':f'{predicted/pred_factor:.2f}k'}
-        except:
+        except Exception as e:
+            print(f'Error as: {e}')
             trend_scores=[0,50,100]
             # trend_score=40
 
